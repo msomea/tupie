@@ -3,4 +3,4 @@ from django.http import HttpResponse
 
 # Create your views here.
 def home(request):
-    return HttpResponse('Welcome to home page')
+    return render(request, 'tupie_app/home.html')
