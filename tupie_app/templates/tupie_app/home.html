@@ -8,22 +8,54 @@
         <link rel="stylesheet" href="{% static 'tupie_app/css/style.css' %}">
     </head>
     <body>
-        <header>
+        <!-- Navigation Bar section -->
+         <nav class="navbar">
+            <div class="logo">Tupie</div>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">List Item</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Donation</a></li>
+            </ul>
+         </nav>
+         <!-- Hero Section -->
+        <header class="hero">
             <hi>WELCOME TO TUPIE</hi>
-            <p>If you'r about to throw something away, we have a way for it to find new home</p>
+            <p>If you're about to throw something away, we have a way for it to find new home</p>
+            <a href="#" class="cta-btn">List an Item</a>
         </header>
-        <main>
-            <section> 
-                <h2>How  it works?</h2>          
+        <!-- How it works -->   
+        <section class="how-it-works"> 
+            <h2>How  it works?</h2>
+            <div class="steps">
                 <ul>
-                    <li>✅ List unwanted items for free</li>
-                    <li>✅ Browse available items in your area</li>
-                    <li>✅ Request items you need</li>
-                    <li>✅ Reduce waste, Help your community</li>
+                    <div class="step">1️⃣ List unwanted items for free</div>
+                    <div class="step">2️⃣ Browse available items nearby</div>
+                    <div class="step">3️⃣ Request what you need the most</div>
+                    <div class="step">4️⃣ Reduce waste & help the community</div>
                 </ul>
-            </section>
-        </main>
-
+            </div>
+        </section>
+        <!-- Item listing placeholder -->
+         <section class="item-listings">
+            <h2>Available Items</h2>
+            <div class="items-grid">
+                <div class="item-card">
+                    <img src="{% static 'tupie_app/media/images/logo.png' %}" alt="Sample Item">
+                    <h3>Sample Item</h3>
+                    <p>Short description of the item</p>
+                    <button>Request</button>   
+                </div>
+                <div class="item-card">
+                    <img src="{% static 'tupie_app/media/images/logo.png' %}" alt="Sample Item">
+                    <h3>Another Sample Item</h3>
+                    <p>Short description of the item</p>
+                    <button>Request</button>   
+                </div>
+            </div>
+            <p class="coming-soon">More items coming soon...</p>
+         </section>
+        <!-- Footer --> 
         <footer>
             <p>&copy; 2025 Tupie Platform</p>
         </footer>
