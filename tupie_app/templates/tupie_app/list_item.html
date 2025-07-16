@@ -1,21 +1,15 @@
+{% extends 'tupie_app/base.html' %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List an Item - Tupie</title>
-    <link rel="stylesheet" href="{% static 'tupie_app/css/style.css' %}">
-</head>
-<body>
-    {% include 'tupie_app/navbar.html' %}
+
+{% block title %}List Item - Tupie{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <h1>List an Item</h1>
+    <p>Here you can submit details of an unwanted item to share with the community.</p>
+    <p>(Form will be added later)</p>
+</section>
     
-    <section class="page-section">
-        <h1>List an Item</h1>
-        <p>Here you can submit details of an unwanted item to share with the community.</p>
-        <p>(Form will be added later)</p>
-    </section>
-    
-    {% include 'tupie_app/footer.html' %}
-</body>
-</html>
+{% endblock %}
+

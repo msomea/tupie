@@ -1,21 +1,15 @@
+{% extends 'tupie_app/base.html' %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donation - Tupie</title>
-    <link rel="stylesheet" href="{% static 'tupie_app/css/style.css' %}">
-</head>
-<body>
-    {% include 'tupie_app/navbar.html' %}
+
+{% block title %}Donation - Tupie{% endblock %}
+
+{% block content %}
     
-    <section class="page-section">
-        <h1>Support Tupie</h1>
-        <p>Your donations help us maintain and improve this platform for the community.</p>
-        <p>(Donation details or integration will be added later)</p>
-    </section>
+<section class="page-section">
+    <h1>Support Tupie</h1>
+    <p>Your donations help us maintain and improve this platform for the community.</p>
+    <p>(Donation details or integration will be added later)</p>
+</section>
     
-    {% include 'tupie_app/footer.html' %}
-</body>
-</html>
+{% endblock %}

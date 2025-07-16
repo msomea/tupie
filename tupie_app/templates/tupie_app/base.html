@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tupie{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'tupie_app/css/style.css' %}">
+    <link rel="icon" href="{% static 'tupie_app/media/images/favicon.ico' %}" type="image/png">
+</head>
+<body>
+
+    {% include 'tupie_app/navbar.html' %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'tupie_app/footer.html' %}
+</body>
+</html>
