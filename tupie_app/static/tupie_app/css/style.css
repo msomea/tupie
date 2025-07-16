@@ -19,10 +19,18 @@ body {
     align-items: center;
 }
 .navbar .logo {
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+.navbar .logo img {
+    height: 50px;
+    width: auto;
+    vertical-align: middle;
+}
+.logo-text {
+    margin-left: 10px;
     font-size: 1.5em;
     font-weight: bold;
     color: white;
-    transition: transform 0.3s ease, background 0.3s ease;
 }
 .navbar .logo:hover {
     transform: translateX(-5px);

@@ -6,11 +6,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tupie Platform</title>
         <link rel="stylesheet" href="{% static 'tupie_app/css/style.css' %}">
+        <link rel="icon" href="{% static 'tupie_app/media/images/favicon.ico' %}" type="image/x-icon">
     </head>
     <body>
         <!-- Navigation Bar section -->
          <nav class="navbar">
-            <div class="logo">Tupie</div>
+            <div class="logo">
+                <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Tupie Logo">
+                <span class="logo-text">Tupie</span>
+            </div>
             <ul>
                 <li><a href="#">Home</a></li>
                 <li><a href="#">List Item</a></li>
