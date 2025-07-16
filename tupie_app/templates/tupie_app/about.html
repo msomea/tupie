@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Tupie</title>
+    <link rel="stylesheet" href="{% static 'tupie_app/css/style.css' %}">
+</head>
+<body>
+    {% include 'tupie_app/navbar.html' %}
+    
+    <section class="page-section">
+        <h1>About Tupie</h1>
+        <p>Tupie is a platform created to reduce waste and help those in need by sharing unwanted items with the community instead of throwing them away.</p>
+        <p>Our mission is to build a sustainable and caring community through sharing.</p>
+    </section>
+    
+    {% include 'tupie_app/footer.html' %}
+</body>
+</html>

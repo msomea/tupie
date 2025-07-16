@@ -1,0 +1,13 @@
+{% load static %}
+<nav class="navbar">
+    <div class="logo">
+        <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Tupie Logo">
+        <span class="logo-text">Tupie</span>
+    </div>
+    <ul>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'list_item' %}">List Item</a></li>
+        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a href="{% url 'donation' %}">Donation</a></li>
+    </ul>
+</nav>
