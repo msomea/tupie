@@ -1,7 +1,7 @@
 {% extends 'tupie_app/base.html' %}
 {% load static %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Tupie{% endblock %}
 
 {% block content %}
 <!--  Hero Section -->
@@ -31,9 +31,9 @@
             {% if item.image %}
                 <img src="{{ item.image.url }}" alt="{{ item.title }}">
             {% else %}
-                <img src="{% static 'tupie_app/media/images/logo.png' %}" alt="Default">
+                <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default">
             {% endif %}
-            <h3>{{ items.title }}</h3>
+            <h3>{{ item.title }}</h3>
             <p>{{ item.description|truncatewords:15 }}</p>
             <small>Category: {{ item.get_category_display }}</small><br>
             <button>Request</button>   

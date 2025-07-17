@@ -5,10 +5,15 @@
 {% block title %}List Item - Tupie{% endblock %}
 
 {% block content %}
-<section class="page-section">
+<section class="form-section">
     <h1>List an Item</h1>
-    <p>Here you can submit details of an unwanted item to share with the community.</p>
-    <p>(Form will be added later)</p>
+    <p>Fill in the details to give your item a new home</p>
+
+    <form method="post", enctype="multipart/form-data" class="item-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-btn">Submit Item</button>
+    </form>
 </section>
     
 {% endblock %}
