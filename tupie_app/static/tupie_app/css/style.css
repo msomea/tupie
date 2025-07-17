@@ -5,18 +5,24 @@ body {
     background: #F5e8d5;
     color: #333;
     margin: 0;
-    padding: 0;
+    padding-top: 100px; /* Space for fixed navbar */
     text-align: center;
 }
 
 /* Navbar */
 .navbar {
+    position: fixed;       /* stays in place while scrolling */
+    top: 0;                /* stick to the top */
+    left: 0;
+    width: 100%;           /* full width */
     background: #4a704a;
     color: white;
     display: flex;
     justify-content: space-between;
     padding: 15px 30px;
     align-items: center;
+    z-index: 1000;         /* stays above other elements */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* slight shadow */
 }
 .navbar .logo {
     transition: transform 0.3s ease, background 0.3s ease;
@@ -46,7 +52,7 @@ body {
     color: white;
     text-decoration: none;
     font-weight: 500;
-    padding: 5px 10px;
+    padding: 5px 50px;
     border-radius: 5px;
     position: relative;
     overflow: hidden;
