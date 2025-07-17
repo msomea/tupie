@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from .models import Item
 
 # Create your views here.
 def home(request):
-    return render(request, 'tupie_app/home.html')
+    items = Item.objects.filter(available=True).order_by('-created_at')[:8]
+    return render(request, 'tupie_app/home.html', {'items': items})
 
 def list_item(request):
     return render(request, 'tupie_app/list_item.html')
