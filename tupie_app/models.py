@@ -8,11 +8,11 @@ class item(models.Model):
         ('clothing', 'Clothing'),
         ('food', 'Food'),
         ('furniture', 'Furniture'),
-        ('home appliance', 'Home Aplliance'),
+        ('home_appliance', 'Home Aplliance'),
         ('kitchenware', 'Kitchenware'),
-        ('office supplies', 'Office Supplies'),
-        ('personal hygiene', 'Personal Hygiene')
-        ('toys and games', 'Toys and Games'),
+        ('office_supplies', 'Office Supplies'),
+        ('personal_hygiene', 'Personal Hygiene'),
+        ('toys_and_games', 'Toys and Games'),
         ('other', 'Other'),
     ]
 
