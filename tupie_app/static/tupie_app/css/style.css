@@ -1,12 +1,33 @@
 /* Globar Styles */
 
-body {
+html, body {
+    height: 100%;
+    margin: 0;
+    padding-top: 90px; /* Space for fixed navbar */
+    text-align: center;
     font-family: Arial, sans-serif;
+}
+body{
     background: #F5e8d5;
     color: #333;
-    margin: 0;
-    padding-top: 100px; /* Space for fixed navbar */
-    text-align: center;
+}
+:target::before {
+    content: "";
+    display: block;
+    height: 90px; /* same as navbar height */
+    margin-top: -100px;
+}
+
+/* Flex layout*/
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Main content */
+.content {
+    flex: 1;
 }
 
 /* Navbar */
@@ -187,5 +208,5 @@ footer {
     color: white;
     padding: 15px;
     text-align: center;
-    margin-top: 30px;
+    margin-top: 20px;
 }

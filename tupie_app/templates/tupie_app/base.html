@@ -9,13 +9,14 @@
     <link rel="icon" href="{% static 'tupie_app/media/images/favicon.ico' %}" type="image/png">
 </head>
 <body>
-
+    <div class="page-wrapper">
     {% include 'tupie_app/navbar.html' %}
 
-    <main>
+    <main class="content">
         {% block content %}{% endblock %}
     </main>
 
     {% include 'tupie_app/footer.html' %}
+    </div>
 </body>
 </html>
