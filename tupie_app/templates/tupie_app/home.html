@@ -35,7 +35,7 @@
             {% endif %}
             <h3>{{ item.title }}</h3>
             <p>{{ item.description|truncatewords:15 }}</p>
-            <small>Category: {{ item.get_category_display }}</small><br>
+            <small>Category: {{ item.get_category_display }}</small><br><br>
             <button>Request</button>   
         </div>
         {% empty %}

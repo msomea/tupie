@@ -6,6 +6,7 @@ class Item(models.Model):
     CATEGORY_CHOICES = [
         ("books", 'Books'),
         ('clothing', 'Clothing'),
+        ('electronic', 'Electronic'),
         ('food', 'Food'),
         ('furniture', 'Furniture'),
         ('home_appliance', 'Home Appliance'),

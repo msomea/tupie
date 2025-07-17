@@ -5,7 +5,7 @@ html, body {
     color: #333;
     height: 100%;
     margin: 0;
-    padding-top: 90px; /* Space for fixed navbar */
+    padding-top: 100px; /* Space for fixed navbar */
     text-align: center;
     font-family: Arial, sans-serif;
 }
@@ -13,7 +13,7 @@ html, body {
 :target::before {
     content: "";
     display: block;
-    height: 90px; /* same as navbar height */
+    height: 100px; /* same as navbar height */
     margin-top: -100px;
 }
 
@@ -235,6 +235,44 @@ html, body {
 }
 .submit-btn:hover {
     background: #3A5A3A;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px auto;
+    gap: 10px;
+    padding: 10px 0;
+}
+.pagination a,
+.pagination span {
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    background: #4A704A;
+    color: white;
+    font-weight: 500;
+    transition: background 0.3 ease;
+}
+.pagination a:hover {
+    background: #3A5A3A;
+}
+.pagination .disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
+.pagination .active {
+    background: #F5E8D5;
+    color: #3A5A3A;
+    font-weight: bold;
+}
+.container {
+    max-width: 11oopx;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
 
