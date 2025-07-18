@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .models import Item
 from .forms import ItemForm
 from django.core.paginator import Paginator
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 # Create your views here.
 def home(request):
@@ -13,6 +15,17 @@ def about(request):
 
 def donation(request):
     return render(request, 'tupie_app/donation.html')
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
 
 def list_item(request):
     if request.method == 'POST':
