@@ -13,6 +13,7 @@ class Item(models.Model):
         ('kitchenware', 'Kitchenware'),
         ('office_supplies', 'Office Supplies'),
         ('personal_hygiene', 'Personal Hygiene'),
+        ('shoes', 'Shoes'),
         ('toys_and_games', 'Toys and Games'),
         ('other', 'Other'),
     ]

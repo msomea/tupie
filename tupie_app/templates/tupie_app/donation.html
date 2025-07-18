@@ -1,15 +1,37 @@
 {% extends 'tupie_app/base.html' %}
-
 {% load static %}
 
-{% block title %}Donation - Tupie{% endblock %}
+{% block title %}Support Tupie - Donations{% endblock %}
 
 {% block content %}
-    
-<section class="page-section">
+<section class="page-section container">
     <h1>Support Tupie</h1>
-    <p>Your donations help us maintain and improve this platform for the community.</p>
-    <p>(Donation details or integration will be added later)</p>
+    <p class="intro">
+        Tupie is a community-driven platform and remains free for everyone.  
+        Your support helps us keep improving and reach more people in need.
+    </p>
+
+    <div class="donation-content">
+        <div class="donation-text">
+            <h2>Why Donate?</h2>
+            <ul>
+                <li>✔️ Help reduce waste in our communities</li>
+                <li>✔️ Support people in need</li>
+                <li>✔️ Keep Tupie free and sustainable</li>
+            </ul>
+            
+            <h2>Ways You Can Help</h2>
+            <p>
+                💳 <strong>Financial donations:</strong> Support hosting and platform improvements.<br>
+                🛠️ <strong>Volunteer your skills:</strong> Help us improve Tupie.<br>
+                📢 <strong>Spread the word:</strong> Share Tupie with friends and neighbors.
+            </p>
+            
+            <a href="#" class="cta-btn">Donate Now</a>
+        </div>
+        <div class="donation-image">
+            <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Donation support">
+        </div>
+    </div>
 </section>
-    
 {% endblock %}

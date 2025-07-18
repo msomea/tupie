@@ -6,51 +6,54 @@
 {% block content %}
 <section class="all-items">
     <div class="container">
-    <h1>All Available Items</h1>
-    <p>Browse through all items listed by the community</p>
+        <h1>All Available Items</h1>
+        <p>Browse through all items listed by the community</p>
 
-    <div class="items-grid">
-        {% for item in page_obj %}
-        <div class="item-card">
-            {% if item.image %}
-                <img src="{{ item.image.url }}" alt="{{ item.title }}">
-            {% else %}
-                <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default">
-            {% endif %}
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.description|truncatewords:15 }}</p>
-            <small>Category: {{ item.get_category_display }}</small><br><br>
-            <button>Request</button>
+        <div class="items-grid">
+            {% for item in page_obj %}
+                <div class="item-card">
+                    <div class="item-image">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                    {% else %}
+                        <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default">
+                    {% endif %}
+                    </div>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.description|truncatewords:15 }}</p>
+                    <small>Category: {{ item.get_category_display }}</small><br><br>
+                    <button>Request</button>
+                </div>
+                {% empty %}
+                <p>No items available yet. Be the first to <a href="{% url 'list_item' %}">list one!</a></p>
+            {% endfor %}
         </div>
-        {% empty %}
-        <p>No items available yet. Be the first to <a href="{% url 'list_item' %}">list one!</a></p>
-        {% endfor %}
-    </div>
-    <!-- Pagination Controls -->
-    {% if page_obj.has_other_pages %}
-    <div class="pagination">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}">« Previous</a>
-        {% else %}
-            <span class="disabled">« Previous</span>
-        {% endif %}
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">« Previous</a>
+            {% else %}
+                <span class="disabled">« Previous</span>
+            {% endif %}
 
-        <!-- Page Numbers -->
-    {% for num in page_obj.paginator.page_range %}
-        {% if num == page_obj.number %}
-            <span class="active">{{ num }}</span>  <!-- current page -->
-        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <a href="?page={{ num }}">{{ num }}</a>
-        {% endif %}
-    {% endfor %}
+            <!-- Page Numbers -->
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="active">{{ num }}</span>  <!-- current page -->
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
 
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">Next »</a>
-        {% else %}
-            <span class="disabled">Next »</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next »</a>
+            {% else %}
+                <span class="disabled">Next »</span>
+            {% endif %}
+        </div>
         {% endif %}
     </div>
-    {% endif %}
-    </div>
+    
 </section>
 {% endblock %}

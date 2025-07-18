@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 
 # Create your views here.
 def home(request):
-    items = Item.objects.filter(available=True).order_by('-created_at')[:8]
+    items = Item.objects.filter(available=True).order_by('-created_at')[:12]
     return render(request, 'tupie_app/home.html', {'items': items})
 
 def about(request):
@@ -30,7 +30,7 @@ def list_item(request):
 
 def listed_items(request):
     item_list = Item.objects.filter(available=True).order_by('-created_at')
-    paginator = Paginator(item_list, 6)
+    paginator = Paginator(item_list, 8)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 

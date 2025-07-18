@@ -4,12 +4,31 @@
 {% block title %}About - Tupie{% endblock %}
 
 {% block content %}
-    
-<section class="page-section">
+<section class="page-section container">
     <h1>About Tupie</h1>
-    <p>Tupie is a platform created to reduce waste and help those in need by sharing unwanted items with the community instead of throwing them away.</p>
-    <p>Our mission is to build a sustainable and caring community through sharing.</p>
-</section>
-    
-{% endblock %}
+    <p class="intro">
+        <strong>Tupie</strong> comes from the Swahili words <em>Tupa</em> (throw) and <em>Mie</em> (give it to me).
+        Instead of throwing away useful items, you can give them a new life by sharing with someone in need.
+    </p>
 
+    <div class="about-content">
+        <div class="about-text">
+            <h2>Our Mission</h2>
+            <p>
+                Tupie helps reduce waste and promotes community support by connecting people who have unwanted items with 
+                those who truly need them. Our platform empowers sustainable living and strengthens local communities.
+            </p>
+            
+            <h2>How It Works</h2>
+            <ul>
+                <li>✔️ List items you no longer need</li>
+                <li>✔️ Browse available items near you</li>
+                <li>✔️ Request and reuse instead of buying new</li>
+            </ul>
+        </div>
+        <div class="about-image">
+            <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Tupie community">
+        </div>
+    </div>
+</section>
+{% endblock %}
