@@ -4,6 +4,7 @@ from .forms import ItemForm
 from django.core.paginator import Paginator
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def home(request):
@@ -27,6 +28,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+@login_required
 def list_item(request):
     if request.method == 'POST':
         form =  ItemForm(request.POST, request.FILES)

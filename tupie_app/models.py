@@ -1,7 +1,6 @@
 from django.db import models
 
 # Create your models here.
-
 class Item(models.Model):
     CATEGORY_CHOICES = [
         ("books", 'Books'),
@@ -17,7 +16,6 @@ class Item(models.Model):
         ('toys_and_games', 'Toys and Games'),
         ('other', 'Other'),
     ]
-
     title = models.CharField(max_length=200)
     description = models.TextField()
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
