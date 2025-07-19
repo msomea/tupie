@@ -31,7 +31,18 @@
     </p>
 
     <div style="margin-top:20px;">
-        <a href="#" class="cta-btn">Request This Items</a>
+        {% if user.is_authenticated %}
+            {% if item.owner != user %}
+                <a href="{% url 'request_item' item.pk %}" class="cta-btn">Request This Item</a>
+            {% else %}
+                <p><em>You own this item.</em></p>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}?next={% url 'item_detail' item.pk %}" class="cta-btn">
+                Login to Request
+            </a>
+        {% endif %}
+        
         <a href="{% url 'listed_items' %}" class="cta-btn" >View More Items</a>
     </div>
 </section>

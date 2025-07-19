@@ -18,6 +18,7 @@ urlpatterns = [
     path('list_item/', views.list_item, name='list_item'),
     path('listed_items/', views.listed_items, name='listed_items'),
     path("item/<int:pk>/", views.item_detail, name="item_detail"),
+    path("item/<int:pk>/request/", views.request_item, name="request_item"),
 
     # AJAX API for Regions
     path("get_districts/", views.get_districts, name="get_districts"),

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, resolve_url
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Item, Region, District, Ward, Place, UserProfile
+from .models import Item, Region, District, Ward, Place, UserProfile, ItemRequest
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse
@@ -94,6 +94,33 @@ def list_item(request):
         'regions': regions,
     }
     return render(request, 'tupie_app/list_item.html', context)
+
+@login_required
+def request_item(request, pk):
+    """Create a request for an item"""
+    item = get_object_or_404(Item, pk=pk)
+
+    # Prevent owner from requesting their own item
+    if item.owner == request.user:
+        messages.error(request, "You cannot request your own item.")
+        return redirect("item_detail", pk=pk)
+
+    # Prevent duplicate requests
+    existing_request = ItemRequest.objects.filter(item=item, requester=request.user).first()
+    if existing_request:
+        messages.warning(request, "You already requested this item.")
+        return redirect("item_detail", pk=pk)
+
+    # Create the request
+    ItemRequest.objects.create(
+        item=item,
+        requester=request.user,
+        owner=item.owner,
+        message=f"{request.user.username} requested {item.title}"
+    )
+
+    messages.success(request, "Request sent successfully!")
+    return redirect("item_detail", pk=pk)
 
 def get_districts(request):
     region_id = request.GET.get('region')
