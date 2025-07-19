@@ -1,0 +1,11 @@
+git log --oneline
+git reset --hard
+git checkout e2f9e39
+
+rm db.sqlite3  # ensure it's really gone
+find . -type d -name "__pycache__" -exec rm -rf {} +  # clear caches
+rm tupie_app/migrations/0*.py  # delete old migration files except __init__.py
+
+
+Pushing after hard reset
+git push -f origin main
