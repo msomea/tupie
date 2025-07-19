@@ -1,20 +1,71 @@
 {% extends 'tupie_app/base.html' %}
-
 {% load static %}
 
 {% block title %}List Item - Tupie{% endblock %}
 
 {% block content %}
-<section class="form-section">
-    <h1>List an Item</h1>
-    <p>Fill in the details to give your item a new home</p>
+<script src="{% static 'tupie_app/js/script.js' %}"></script>
 
-    <form method="post", enctype="multipart/form-data" class="item-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="submit-btn">Submit Item</button>
+<section class="form-section container">
+
+  <header class="form-header">
+    <h1 class="form-title">List an Item</h1>
+    <p class="form-subtitle">Fill in the details to give your item a new home</p>
+  </header>
+
+  <div class="form-card">
+    <form method="post" enctype="multipart/form-data" class="item-form">
+      {% csrf_token %}
+
+      <!-- Title -->
+      <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Title</label>
+        {{ form.title }}
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Description</label>
+        {{ form.description }}
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="{{ form.category.id_for_label }}">Category</label>
+        {{ form.category }}
+      </div>
+
+      <!-- Image -->
+      <div class="form-group">
+        <label for="{{ form.image.id_for_label }}">Photo (optional)</label>
+        {{ form.image }}
+      </div>
+
+        <!-- Region -->
+        <div class="form-group">
+            <label for="id_region">Region</label>
+            <select name="region" id="id_region">
+              <option value="">-- Select Region --</option>
+              {% for region in regions %}
+                <option value="{{ region.region_code }}">{{ region.region_name }}</option>
+              {% endfor %}
+            </select>
+        </div>
+
+      <!-- Street -->
+      <div class="form-group">
+        <label for="{{ form.street.id_for_label }}">Street (optional)</label>
+        {{ form.street }}
+      </div>
+
+      <!-- Submit -->
+      <div class="form-actions">
+        <button type="submit" class="btn primary-btn">✅ Submit Item</button>
+        <a href="{% url 'home' %}" class="btn secondary-btn">⬅ Cancel</a>
+      </div>
+
     </form>
-</section>
-    
-{% endblock %}
+  </div>
 
+</section>
+{% endblock %}

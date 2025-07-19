@@ -1,14 +1,26 @@
 {% load static %}
+
 <nav class="navbar">
     <div class="logo">
         <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Tupie Logo">
         <span class="logo-text">Tupie</span>
     </div>
-    <ul>
+
+    <ul class="nav-links">
+        <!-- Always visible links -->
         <li><a href="{% url 'home' %}">Home</a></li>
         <li><a href="{% url 'list_item' %}">List Item</a></li>
         <li><a href="{% url 'listed_items' %}">Browse All</a></li>
         <li><a href="{% url 'about' %}">About</a></li>
         <li><a href="{% url 'donation' %}">Donation</a></li>
+
+        <!-- Auth-dependent links -->
+        {% if user.is_authenticated %}
+            <li><span class="welcome-text">Welcome, {{ user.username }}</span></li>
+            <li><a href="{% url 'logout' %}" class="logout-link">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'signup' %}">Sign Up</a></li>
+        {% endif %}
     </ul>
 </nav>

@@ -5,7 +5,7 @@ html, body {
     color: #333;
     height: 20%;
     margin: 0;
-    padding-top: 100px; /* Space for fixed navbar */
+    padding-top: 130px; /* Space for fixed navbar */
     text-align: center;
     font-family: Arial, sans-serif;
 }
@@ -13,7 +13,7 @@ html, body {
 :target::before {
     content: "";
     display: block;
-    height: 20px; /* same as navbar height */
+    height: 130px; /* same as navbar height */
     margin-top: -100px;
 }
 
@@ -81,12 +81,18 @@ html, body {
 .navbar li a:hover {
     transform: translateX(-5px);
 }
+.navbar .welcome-text {
+    font-weight: bold;
+    color: white
+    margin-right: 10px;
+}
+
 
 /* Hero section */
 .hero {
     background: #4a704a;
     color: white;
-    padding: 60px 20px;
+    padding: 40px 20px;
     text-align: center;
 }
 .hero h1 {
