@@ -1,11 +1,11 @@
 {# tupie_app/_verification_badge.html #}
 
 {% if user_profile.verification_status == "verified" %}
-  <span class="badge blue-check" title="Verified User" style="color:#1E90FF;">✔️</span>
+  <sup class="badge blue-check" title="Verified User">✔️</sup>
 
 {% elif user_profile.verification_status == "organization" %}
-  <span class="badge gold-check" title="Organization Verified" style="color:#FFD700;">⭐</span>
+  <sup class="badge gold-check" title="Organization Verified">⭐</sup>
 
 {% else %}
-  {# Unverified - show nothing #}
+  {# Unverified - no badge #}
 {% endif %}

@@ -231,7 +231,7 @@ html, body {
     margin-bottom: 10px;
 }
 /* ✅ Button stays aligned at bottom */
-.item-card button {
+.item-card button, .cta-btn {
     background: #4A704A;
     color: white;
     border: none;
@@ -241,7 +241,7 @@ html, body {
     transition: transform 0.3s ease, color 0.3s ease;
     margin-top: auto; /* pushes it down */
 }
-.item-card button:hover {
+.item-card button:hover, .cta-btn:hover {
     transform: translateY(-5px);
     background: #3A5A3A;
 }
@@ -405,6 +405,21 @@ html, body {
     max-width: 80%;
     margin: 0 auto;
   }
+}
+/* Badge styles */
+.badge {
+  font-size: 0.8em;
+  margin-left: 3px;
+  vertical-align: super; /* ✅ moves it slightly up */
+  font-weight: bold;
+}
+
+.blue-check {
+  color: #1E90FF; /* DodgerBlue */
+}
+
+.gold-check {
+  color: #FFD700; /* Gold */
 }
 
 

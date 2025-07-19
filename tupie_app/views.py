@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from .forms import ItemForm, SignUpForm
+from django.shortcuts import get_object_or_404
+
 
 # Create your views here.
 def home(request):
@@ -67,6 +69,11 @@ def listed_items(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'tupie_app/listed_items.html', {'page_obj': page_obj})
+
+def item_detail(request, pk):
+    """Show full details of a single item"""
+    item = get_object_or_404(Item, pk=pk)
+    return render(request, "tupie_app/item_detail.html", {"item": item})
 
 @login_required(login_url='/login/')
 def list_item(request):

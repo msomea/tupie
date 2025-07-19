@@ -1,0 +1,38 @@
+{% extends "tupie_app/base.html" %}
+{% load static %}
+
+{% block title %}{{ item.title }} - Details{% endblock %}
+
+{% block content %}
+<section class="form-section">
+    <h1>{{ item.title }}</h1>
+
+    <div class="item-image">
+        {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width:400px;border-radius:8px;">
+        {% else %}
+            <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default" style="max-width:200px;">
+        {% endif %}
+    </div>
+
+    <p><strong>Description:</strong> {{ item.description }}</p>
+
+    <p><strong>Category:</strong> {{ item.get_category_display }}</p>
+
+    <p><strong>Location:</strong>
+        {% if item.street %}{{ item.street }}, {% endif %}
+        {% if item.district %}{{ item.district.district_name }}, {% endif %}
+        {% if item.region %}{{ item.region.region_name }}{% endif %}
+    </p>
+
+    <p><strong>Listed by:</strong>
+        {{ item.owner.username }}
+        {% include "tupie_app/_verification_badge.html" with user_profile=item.owner.userprofile %}
+    </p>
+
+    <div style="margin-top:20px;">
+        <a href="#" class="cta-btn">Request This Items</a>
+        <a href="{% url 'listed_items' %}" class="cta-btn" >View More Items</a>
+    </div>
+</section>
+{% endblock %}
