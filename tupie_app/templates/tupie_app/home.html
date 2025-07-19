@@ -4,14 +4,14 @@
 {% block title %}Tupie{% endblock %}
 
 {% block content %}
-<!--  Hero Section -->
+<!-- ✅ Hero Section -->
 <header class="hero">
     <h1>WELCOME TO TUPIE</h1>
     <p>If you're about to throw something away, we have a way for it to find a new home</p>
     <a href="{% url 'list_item' %}" class="cta-btn">List an Item</a>
 </header>
 
-<!--  How it works -->   
+<!-- ✅ How it works -->
 <section class="how-it-works"> 
     <h2>How it works?</h2>
     <div class="steps">
@@ -22,26 +22,14 @@
     </div>
 </section>
 
-<!--  Item listing placeholder -->
+<!-- ✅ Recent Items -->
 <section class="item-listings">
-    <h2>Recent Added Items</h2>
+    <h2>Recently Added Items</h2>
     <div class="items-grid">
         {% for item in items %}
-        <div class="item-card">
-            <div class="item-image">
-            {% if item.image %}
-                <img src="{{ item.image.url }}" alt="{{ item.title }}">
-            {% else %}
-                <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default">
-            {% endif %}
-            </div>
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.description|truncatewords:15 }}</p>
-            <small>Category: {{ item.get_category_display }}</small><br><br>
-            <button>Request</button>
-            </div>   
+            {% include "tupie_app/_item_card.html" with item=item %}
         {% empty %}
-        <p class="coming-soon">No items availabe at the moment...</p>
+            <p class="coming-soon">No items available at the moment...</p>
         {% endfor %}
     </div>
 </section>

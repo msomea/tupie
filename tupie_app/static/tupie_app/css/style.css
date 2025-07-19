@@ -250,6 +250,20 @@ html, body {
     font-style: italic;
     color: #4A704A;
 } 
+/* Items card */
+.item-card .location {
+    font-size: 0.8rem;        /* ✅ smaller text */
+    color: #666;              /* ✅ subtle grey */
+    line-height: 1.2;         /* ✅ compact spacing */
+    margin: 5px 0;            /* ✅ small margin */
+    word-wrap: break-word;    /* ✅ prevent overflow */
+    text-align: center;       /* ✅ keep aligned nicely */
+}
+
+.item-card .location small span {
+    color: #aaa;  /* ✅ lighter arrows */
+}
+
 
 /* Form section*/
 .form-section{

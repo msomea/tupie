@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, resolve_url
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Item, Region, District, Ward, Place, UserProfile
-from .forms import ItemForm, CustomUserCreationForm
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from .forms import ItemForm, SignUpForm
 
 # Create your views here.
 def home(request):
@@ -26,13 +27,13 @@ def signup(request):
         password = request.POST.get('password1')
 
         form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()  # This triggers UserProfile auto-create
-            # Update phone number
+        if not phone:
+            messages.error(request, 'Phone number is required.')
+        elif form.is_valid():
+            user = form.save()  # Auto-creates UserProfile via signal
             user.userprofile.phone_number = phone
             user.userprofile.save()
 
-            # ✅ Auto-login new user
             auth_login(request, user)
             messages.success(request, 'Account created & logged in!')
             return redirect('home')

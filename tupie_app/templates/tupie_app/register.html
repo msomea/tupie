@@ -6,15 +6,44 @@
 {% block content %}
 <section class="form-section">
     <h2>Create an Account</h2>
+
     <form method="post" class="item-form">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <!-- Username -->
+        <p>
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {{ form.username.errors }}
+        </p>
+
+        <!-- Phone number -->
+        <p>
+            <label for="id_phone_number">Phone Number</label>
+            <input type="text" name="phone_number" id="id_phone_number" 
+                   placeholder="Enter your phone number" required>
+        </p>
+
+        <!-- Password -->
+        <p>
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+        </p>
+
+        <!-- Confirm password -->
+        <p>
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+        </p>
+
         <button type="submit" class="submit-btn">Sign Up</button>
     </form>
 
-        <p class="alt-link">
+    <p class="alt-link">
         Already have an account?<br><br>
         <a href="{% url 'login' %}" class="cta-btn">Login</a>
-        </p>
+    </p>
 </section>
 {% endblock %}

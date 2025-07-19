@@ -1,5 +1,5 @@
 from django import forms
-from .models import Item, Region, District, Ward, Place
+from .models import Item, Region, District, Ward, Place, Street, UserProfile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -55,18 +55,25 @@ class ItemForm(forms.ModelForm):
         elif self.instance.pk and self.instance.ward:
             self.fields['place'].queryset = Place.objects.filter(ward=self.instance.ward).order_by('place_name')
 
-class CustomUserCreationForm(UserCreationForm):
-    phone_number = forms.CharField(max_length=20, required=True)
+class SignUpForm(UserCreationForm):
+    phone_number = forms.CharField(
+        max_length=15,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'Enter your phone number'})
+    )
 
     class Meta:
         model = User
-        fields = ('username', 'phone_number', 'password1', 'password2')
+        fields = ['username', 'phone_number', 'password1', 'password2']
 
     def save(self, commit=True):
-        user = super().save(commit=False)
+        user = super().save(commit=commit)
+        phone = self.cleaned_data.get('phone_number')
+
         if commit:
-            user.save()
-            # Save phone number to UserProfile
-            user.userprofile.phone_number = self.cleaned_data['phone_number']
-            user.userprofile.save()
+            # Update UserProfile phone number
+            profile, created = UserProfile.objects.get_or_create(user=user)
+            profile.phone_number = phone
+            profile.save()
+
         return user

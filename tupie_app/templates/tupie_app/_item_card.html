@@ -1,0 +1,55 @@
+{% load static %}
+
+<div class="item-card">
+
+    <!-- ✅ Item Image -->
+    <div class="item-image">
+        {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.title }}">
+        {% else %}
+            <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default">
+        {% endif %}
+    </div>
+
+    <!-- ✅ Title & Description -->
+    <h3>{{ item.title }}</h3>
+    <p>{{ item.description|truncatewords:15 }}</p>
+
+    <!-- ✅ Category -->
+    <small><strong>Category:</strong> {{ item.get_category_display }}</small><br><br>
+
+    <!-- ✅ Owner + Verification Badge -->
+    <p>
+        <strong class="owner">👤:</strong> {{ item.owner.username }}
+        {% include 'tupie_app/_verification_badge.html' with user_profile=item.owner.userprofile %}
+    </p>
+
+    <!-- ✅ Improved Location Display -->
+    {% if item.street or item.place or item.ward or item.district or item.region %}
+    <p class="location">
+        <small>
+            📍 
+            {% if item.street %}
+                {{ item.street }} <span>➜</span>
+            {% endif %}
+            {% if item.place %}
+                {{ item.place.place_name }} <span>➜</span>
+            {% endif %}
+            {% if item.ward %}
+                {{ item.ward.ward_name }} <span>➜</span>
+            {% endif %}
+            {% if item.district %}
+                {{ item.district.district_name }} <span>➜</span>
+            {% endif %}
+            {% if item.region %}
+                {{ item.region.region_name }}
+            {% endif %}
+        </small>
+    </p>
+    {% else %}
+        <p class="location"><em>No location provided</em></p>
+    {% endif %}
+
+    <!-- ✅ Request Button -->
+    <button>Request</button>
+</div>
