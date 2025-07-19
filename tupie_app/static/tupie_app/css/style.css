@@ -83,8 +83,23 @@ html, body {
 }
 .navbar .welcome-text {
     font-weight: bold;
-    color: white
+    color: white;
     margin-right: 10px;
+}
+
+/* User profile badge*/
+.badge {
+  font-weight: bold;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.blue-check {
+  color: #1E90FF; /* DodgerBlue */
+}
+
+.gold-check {
+  color: #FFD700; /* Gold */
 }
 
 

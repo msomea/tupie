@@ -6,22 +6,12 @@
 {% block content %}
 <section class="form-section">
     <h2>Create an Account</h2>
-    <form method="POST">
+    <form method="post" class="item-form">
         {% csrf_token %}
-        {{ form.non_field_errors }}
-        <div class="item-form">
-            {% for field in form %}
-                <p>
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% if field.errors %}
-                        <span style="color: red;">{{ field.errors|striptags }}</span>
-                    {% endif %}
-                </p>
-            {% endfor %}
-        </div>
+        {{ form.as_p }}
         <button type="submit" class="submit-btn">Sign Up</button>
     </form>
+
         <p class="alt-link">
         Already have an account?<br><br>
         <a href="{% url 'login' %}" class="cta-btn">Login</a>

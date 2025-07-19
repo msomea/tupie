@@ -14,7 +14,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tupie_app',
+    'tupie_app.apps.TupieAppConfig',
 ]
 
 MIDDLEWARE = [

@@ -16,7 +16,11 @@
 
         <!-- Auth-dependent links -->
         {% if user.is_authenticated %}
-            <li><span class="welcome-text">Welcome, {{ user.username }}</span></li>
+        <li>
+                <span class="welcome-text">Welcome, {{ user.username }}
+                {% include 'tupie_app/_verification_badge.html' %}
+                </span>
+        </li>
             <li><a href="{% url 'logout' %}" class="logout-link">Logout</a></li>
         {% else %}
             <li><a href="{% url 'login' %}">Login</a></li>

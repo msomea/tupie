@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, resolve_url
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.contrib.auth.forms import UserCreationForm
-from .models import Item, Region
-from .forms import ItemForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .models import Item, Region, UserProfile
+from .forms import ItemForm, CustomUserCreationForm
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse
@@ -21,12 +21,21 @@ def donation(request):
 
 def signup(request):
     if request.method == 'POST':
+        username = request.POST.get('username')
+        phone = request.POST.get('phone_number')
+        password = request.POST.get('password1')
+
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()  # Create the user
-            auth_login(request, user)  # ✅ Auto-login after registration
-            messages.success(request, f"Welcome {user.username}, your account was created and you are now logged in!")
-            return redirect('home')  # Go to home or any other page
+            user = form.save()  # This triggers UserProfile auto-create
+            # Update phone number
+            user.userprofile.phone_number = phone
+            user.userprofile.save()
+
+            # ✅ Auto-login new user
+            auth_login(request, user)
+            messages.success(request, 'Account created & logged in!')
+            return redirect('home')
         else:
             messages.error(request, 'Please fix the errors below.')
     else:
@@ -36,16 +45,15 @@ def signup(request):
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        next_url = request.GET.get('next') or resolve_url('tupie_app:home')
-        if user:
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
             auth_login(request, user)
+            next_url = request.GET.get('next') or resolve_url('home')
             return redirect(next_url)
-        else:
-            messages.error(request, 'Invalid Username or Password.')
-    return render(request, 'tupie_app/login.html')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'tupie_app/login.html', {'form': form})
 
 def logout_view(request):
     auth_logout(request)

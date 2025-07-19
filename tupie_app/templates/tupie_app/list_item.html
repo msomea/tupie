@@ -1,71 +1,62 @@
 {% extends 'tupie_app/base.html' %}
+
 {% load static %}
 
 {% block title %}List Item - Tupie{% endblock %}
 
 {% block content %}
-<script src="{% static 'tupie_app/js/script.js' %}"></script>
+<section class="form-section">
+    <h1>List an Item</h1>
+    <p>Fill in the details to give your item a new home</p>
 
-<section class="form-section container">
-
-  <header class="form-header">
-    <h1 class="form-title">List an Item</h1>
-    <p class="form-subtitle">Fill in the details to give your item a new home</p>
-  </header>
-
-  <div class="form-card">
     <form method="post" enctype="multipart/form-data" class="item-form">
-      {% csrf_token %}
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        
+        <p>
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {{ form.title.errors }}
+        </p>
 
-      <!-- Title -->
-      <div class="form-group">
-        <label for="{{ form.title.id_for_label }}">Title</label>
-        {{ form.title }}
-      </div>
+        <p>
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {{ form.description.errors }}
+        </p>
 
-      <!-- Description -->
-      <div class="form-group">
-        <label for="{{ form.description.id_for_label }}">Description</label>
-        {{ form.description }}
-      </div>
+        <p>
+            {{ form.category.label_tag }}
+            {{ form.category }}
+            {{ form.category.errors }}
+        </p>
 
-      <!-- Category -->
-      <div class="form-group">
-        <label for="{{ form.category.id_for_label }}">Category</label>
-        {{ form.category }}
-      </div>
+        <p>
+            {{ form.image.label_tag }}
+            {{ form.image }}
+            {{ form.image.errors }}
+        </p>
 
-      <!-- Image -->
-      <div class="form-group">
-        <label for="{{ form.image.id_for_label }}">Photo (optional)</label>
-        {{ form.image }}
-      </div>
-
-        <!-- Region -->
-        <div class="form-group">
+        <p>
             <label for="id_region">Region</label>
-            <select name="region" id="id_region">
-              <option value="">-- Select Region --</option>
-              {% for region in regions %}
-                <option value="{{ region.region_code }}">{{ region.region_name }}</option>
-              {% endfor %}
+            <select name="region" id="id_region" class="form-control">
+                <option value="">-- Select Region --</option>
+                {% for region in regions %}
+                    <option value="{{ region.region_code }}" {% if form.region.value == region.region_code|stringformat:"s" %}selected{% endif %}>{{ region.region_name }}</option>
+                {% endfor %}
             </select>
-        </div>
+            {% if form.region.errors %}
+                <span class="error">{{ form.region.errors }}</span>
+            {% endif %}
+        </p>
 
-      <!-- Street -->
-      <div class="form-group">
-        <label for="{{ form.street.id_for_label }}">Street (optional)</label>
-        {{ form.street }}
-      </div>
+        <p>
+            {{ form.street.label_tag }}
+            {{ form.street }}
+            {{ form.street.errors }}
+        </p>
 
-      <!-- Submit -->
-      <div class="form-actions">
-        <button type="submit" class="btn primary-btn">✅ Submit Item</button>
-        <a href="{% url 'home' %}" class="btn secondary-btn">⬅ Cancel</a>
-      </div>
-
+        <button type="submit" class="submit-btn">Submit Item</button>
     </form>
-  </div>
-
 </section>
 {% endblock %}

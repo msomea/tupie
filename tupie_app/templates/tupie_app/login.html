@@ -2,26 +2,13 @@
 {% block title %}Login{% endblock %}
 {% block content %}
 <section class="form-section">
-    <h2>Login</h2>
-    <form method="post" class="login-form">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            {{ form.username }}
-            {% if form.username.errors %}
-                <span class="error">{{ form.username.errors|striptags }}</span>
-            {% endif %}
-        </div>
-        
-        <div class="form-group">
-            {{ form.password }}
-            {% if form.password.errors %}
-                <span class="error">{{ form.password.errors|striptags }}</span>
-            {% endif %}
-        </div>
+    <h1>Login</h1>
+    <p>Enter your credentials</p>
 
-        <!-- Full-width button -->
-        <button type="submit" class="submit-btn full-width">Login</button>
+    <form method="post" class="item-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-btn">Log In</button>
     </form>
     <p class="alt-link">
         Don’t have an account?<br><br>
