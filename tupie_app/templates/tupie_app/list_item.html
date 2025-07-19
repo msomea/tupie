@@ -1,5 +1,4 @@
 {% extends 'tupie_app/base.html' %}
-
 {% load static %}
 
 {% block title %}List Item - Tupie{% endblock %}
@@ -9,10 +8,10 @@
     <h1>List an Item</h1>
     <p>Fill in the details to give your item a new home</p>
 
-    <form method="post" enctype="multipart/form-data" class="item-form">
+    <form method="post" enctype="multipart/form-data" class="item-form" id="item-form">
         {% csrf_token %}
         {{ form.non_field_errors }}
-        
+
         <p>
             {{ form.title.label_tag }}
             {{ form.title }}
@@ -51,6 +50,46 @@
         </p>
 
         <p>
+            <label for="id_district">District</label>
+            <select name="district" id="id_district" class="form-control">
+                <option value="">-- Select District --</option>
+                {% if form.district.value %}
+                    <!-- Optionally populate with district name for edit forms -->
+                    <option value="{{ form.district.value }}" selected>{{ form.district.value }}</option>
+                {% endif %}
+            </select>
+            {% if form.district.errors %}
+                <span class="error">{{ form.district.errors }}</span>
+            {% endif %}
+        </p>
+
+        <p>
+            <label for="id_ward">Ward</label>
+            <select name="ward" id="id_ward" class="form-control">
+                <option value="">-- Select Ward --</option>
+                {% if form.ward.value %}
+                    <option value="{{ form.ward.value }}" selected>{{ form.ward.value }}</option>
+                {% endif %}
+            </select>
+            {% if form.ward.errors %}
+                <span class="error">{{ form.ward.errors }}</span>
+            {% endif %}
+        </p>
+
+        <p>
+            <label for="id_place">Place</label>
+            <select name="place" id="id_place" class="form-control">
+                <option value="">-- Select Place --</option>
+                {% if form.place.value %}
+                    <option value="{{ form.place.value }}" selected>{{ form.place.value }}</option>
+                {% endif %}
+            </select>
+            {% if form.place.errors %}
+                <span class="error">{{ form.place.errors }}</span>
+            {% endif %}
+        </p>
+
+        <p>
             {{ form.street.label_tag }}
             {{ form.street }}
             {{ form.street.errors }}
@@ -59,4 +98,7 @@
         <button type="submit" class="submit-btn">Submit Item</button>
     </form>
 </section>
+
+<script src="{% static 'tupie_app/js/script.js' %}"></script>
+
 {% endblock %}

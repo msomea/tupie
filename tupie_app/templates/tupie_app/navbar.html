@@ -17,7 +17,7 @@
         <!-- Auth-dependent links -->
         {% if user.is_authenticated %}
         <li>
-                <span class="welcome-text">Welcome, {{ user.username }}
+                <span class="welcome-text">{{ user.username }}
                 {% include 'tupie_app/_verification_badge.html' %}
                 </span>
         </li>

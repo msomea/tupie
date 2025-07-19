@@ -19,7 +19,9 @@ urlpatterns = [
     path('listed_items/', views.listed_items, name='listed_items'),
 
     # AJAX API for Regions
-    path('get_regions/', views.get_regions, name='get_regions'),
+    path("get_districts/", views.get_districts, name="get_districts"),
+    path("get_wards/", views.get_wards, name="get_wards"),
+    path("get_places/", views.get_places, name="get_places"),
 ]
 
 # Serve media files in development

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, resolve_url
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Item, Region, UserProfile
+from .models import Item, Region, District, Ward, Place, UserProfile
 from .forms import ItemForm, CustomUserCreationForm
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -69,7 +69,7 @@ def listed_items(request):
 
 @login_required(login_url='/login/')
 def list_item(request):
-    regions = Region.objects.all()
+    regions = Region.objects.all().order_by('region_name')
 
     if request.method == 'POST':
         form = ItemForm(request.POST, request.FILES)
@@ -77,22 +77,27 @@ def list_item(request):
             item = form.save(commit=False)
             item.owner = request.user
             item.save()
-            messages.success(request, 'Item added successfully!')
             return redirect('home')
     else:
         form = ItemForm()
 
-    return render(request, 'tupie_app/list_item.html', {
+    context = {
         'form': form,
-        'regions': regions
-    })
+        'regions': regions,
+    }
+    return render(request, 'tupie_app/list_item.html', context)
 
-def get_regions(request):
-    regions = Region.objects.all().values('region_code', 'region_name').order_by('region_name')
-    return JsonResponse(list(regions), safe=False)
+def get_districts(request):
+    region_id = request.GET.get('region')
+    districts = District.objects.filter(region_id=region_id).order_by('district_name').values('district_code', 'district_name')
+    return JsonResponse(list(districts), safe=False)
 
+def get_wards(request):
+    district_id = request.GET.get('district')
+    wards = Ward.objects.filter(district_id=district_id).order_by('ward_name').values('ward_code', 'ward_name')
+    return JsonResponse(list(wards), safe=False)
 
-# def get_regions(request):
-#     regions = Region.objects.all().order_by('region_name')
-#     return render(request, 'tupie_app/list_item.html', {'regions': regions, 'form': form})
-
+def get_places(request):
+    ward_id = request.GET.get('ward')
+    places = Place.objects.filter(ward_id=ward_id).order_by('place_name').values('id', 'place_name')
+    return JsonResponse(list(places), safe=False)

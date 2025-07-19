@@ -9,3 +9,13 @@ rm tupie_app/migrations/0*.py  # delete old migration files except __init__.py
 
 Pushing after hard reset
 git push -f origin main
+
+
+regions table has following colums:
+region_name, region_code, general_locations_id, country_id
+district table has following colums:
+district_name, district_code, general_locations_id, region_id, country_id
+wards table has following colums:
+ward_name, ward_code, district_id, region_id, country_id, general_locations_id
+place table has following colums:
+place_name, ward_id, district_id, region_id, country_id, general_locations_id

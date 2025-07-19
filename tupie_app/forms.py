@@ -1,42 +1,59 @@
 from django import forms
-from .models import Item, Region
+from .models import Item, Region, District, Ward, Place
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
-class ItemForm(forms.ModelForm):
-    region = forms.ModelChoiceField(
-        queryset=Region.objects.all(),
-        empty_label='Select Region',
-        required=True
-    )
-    
-    street = forms.CharField(
-        required=False,
-        max_length=100,
-        label='Street (optional)',
-        widget=forms.TextInput(attrs={'placeholder': 'Enter street'})
-    )
 
+class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['title', 'description', 'category', 'image', 'region', 'street']
+        fields = ['title', 'description', 'category', 'image', 'region', 'district', 'ward', 'place', 'street']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter item title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Describe the item'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'region': forms.Select(attrs={'class': 'form-control'}),
+            'district': forms.Select(attrs={'class': 'form-control'}),
+            'ward': forms.Select(attrs={'class': 'form-control'}),
+            'place': forms.Select(attrs={'class': 'form-control'}),
+            'street': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter street'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['region'].queryset = Region.objects.all().order_by('region_name')
 
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        if not cleaned_data.get('region'):
-            raise forms.ValidationError("Please select a Region")
-        return cleaned_data
+        # Initially empty queryset for dependent fields
+        self.fields['district'].queryset = District.objects.none()
+        self.fields['ward'].queryset = Ward.objects.none()
+        self.fields['place'].queryset = Place.objects.none()
+
+        if 'region' in self.data:
+            try:
+                region_id = int(self.data.get('region'))
+                self.fields['district'].queryset = District.objects.filter(region_id=region_id).order_by('district_name')
+            except (ValueError, TypeError):
+                pass  # invalid input from the client; ignore and fallback to empty
+        elif self.instance.pk and self.instance.region:
+            self.fields['district'].queryset = District.objects.filter(region=self.instance.region).order_by('district_name')
+
+        if 'district' in self.data:
+            try:
+                district_id = int(self.data.get('district'))
+                self.fields['ward'].queryset = Ward.objects.filter(district_id=district_id).order_by('ward_name')
+            except (ValueError, TypeError):
+                pass
+        elif self.instance.pk and self.instance.district:
+            self.fields['ward'].queryset = Ward.objects.filter(district=self.instance.district).order_by('ward_name')
+
+        if 'ward' in self.data:
+            try:
+                ward_id = int(self.data.get('ward'))
+                self.fields['place'].queryset = Place.objects.filter(ward_id=ward_id).order_by('place_name')
+            except (ValueError, TypeError):
+                pass
+        elif self.instance.pk and self.instance.ward:
+            self.fields['place'].queryset = Place.objects.filter(ward=self.instance.ward).order_by('place_name')
 
 class CustomUserCreationForm(UserCreationForm):
     phone_number = forms.CharField(max_length=20, required=True)
