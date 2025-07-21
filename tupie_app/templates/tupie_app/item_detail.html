@@ -5,8 +5,15 @@
 
 {% block content %}
 <section class="form-section">
-    <h1>{{ item.title }}</h1>
+    {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <p class="{{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
 
+    <h1>{{ item.title }}</h1>
     <div class="item-image">
         {% if item.image %}
             <img src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width:400px;border-radius:8px;">
@@ -19,31 +26,43 @@
 
     <p><strong>Category:</strong> {{ item.get_category_display }}</p>
 
+    <p><strong>Listed by:</strong>
+        {{ item.owner.username }}
+        {% include "tupie_app/_verification_badge.html" with user_profile=item.owner.userprofile %}
+    </p>
+
+    <p>
+        {% if item.available %}
+            <span class="status available">✅ Available</span>
+        {% else %}
+            <span class="status unavailable">❌ Taken</span>
+        {% endif %}
+        <br>
+    </p>
+
     <p><strong>Location:</strong>
         {% if item.street %}{{ item.street }}, {% endif %}
         {% if item.district %}{{ item.district.district_name }}, {% endif %}
         {% if item.region %}{{ item.region.region_name }}{% endif %}
     </p>
 
-    <p><strong>Listed by:</strong>
-        {{ item.owner.username }}
-        {% include "tupie_app/_verification_badge.html" with user_profile=item.owner.userprofile %}
-    </p>
+
 
     <div style="margin-top:20px;">
         {% if user.is_authenticated %}
-            {% if item.owner != user %}
-                <a href="{% url 'request_item' item.pk %}" class="cta-btn">Request This Item</a>
+            {% if not item.available %}
+                <button disabled style="background:#ccc;" class="cta-btn">Not Available</button>
+            {% elif item.owner == user %}
+                <button disabled style="background:#ccc;" class="cta-btn">Your Item</button>
             {% else %}
-                <p><em>You own this item.</em></p>
+                <a href="{% url 'request_item' item.id %}"><button class="cta-btn">Request</button></a>
             {% endif %}
         {% else %}
-            <a href="{% url 'login' %}?next={% url 'item_detail' item.pk %}" class="cta-btn">
-                Login to Request
-            </a>
+            <a href="{% url 'login' %}" class="cta-btn">Login to Request</a>
         {% endif %}
+
         
-        <a href="{% url 'listed_items' %}" class="cta-btn" >View More Items</a>
+        <a href="{% url 'listed_items' %}"><button class="cta-btn">View More Items</button></a>
     </div>
 </section>
 {% endblock %}

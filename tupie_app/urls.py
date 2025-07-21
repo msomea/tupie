@@ -20,6 +20,12 @@ urlpatterns = [
     path("item/<int:pk>/", views.item_detail, name="item_detail"),
     path("item/<int:pk>/request/", views.request_item, name="request_item"),
 
+    # Item Request
+    path("requests_dashboard/", views.requests_dashboard, name="requests_dashboard"),
+    path("update_request/<int:request_id>/<str:action>/", views.update_request_status, name="update_request_status"),
+    path("my-requests/", views.outgoing_requests_dashboard, name="outgoing_requests_dashboard"),
+
+
     # AJAX API for Regions
     path("get_districts/", views.get_districts, name="get_districts"),
     path("get_wards/", views.get_wards, name="get_wards"),

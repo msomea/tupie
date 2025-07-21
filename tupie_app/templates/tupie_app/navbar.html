@@ -19,6 +19,8 @@
         <li>
                 <span class="welcome-text">{{ user.username }}
                 {% include 'tupie_app/_verification_badge.html' %}
+                <li><a href="{% url 'requests_dashboard' %}">Requests</a></li>
+                <li><a href="{% url 'outgoing_requests_dashboard' %}">My Requests</a></li>
                 </span>
         </li>
             <li><a href="{% url 'logout' %}" class="logout-link">Logout</a></li>

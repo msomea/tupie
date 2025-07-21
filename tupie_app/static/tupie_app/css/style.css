@@ -337,10 +337,24 @@ html, body {
         grid-template-columns: 1fr;
     }
 }
+/* Availability */
+.status {
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 5px;
+}
 
+.status.available {
+    color: green;
+}
+
+.status.unavailable {
+    color: red;
+}
 /* Page section About & Donation */
-.page-section {
-    margin-top: 100px;
+.page-section,  .requests-dashboard, .all-items, .form-section {
+    margin-top: 50px;
     padding: 40px 0;
 }
 .page-section h1 {

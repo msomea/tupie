@@ -9,11 +9,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from .forms import ItemForm, SignUpForm
 from django.shortcuts import get_object_or_404
+from django.db.models import Prefetch
 
 
 # Create your views here.
 def home(request):
-    items = Item.objects.filter(available=True).order_by('-created_at')[:12]
+    items = Item.objects.filter(available=True).order_by('-created_at')[:8]
     return render(request, 'tupie_app/home.html', {'items': items})
 
 def about(request):
@@ -31,6 +32,7 @@ def signup(request):
         form = UserCreationForm(request.POST)
         if not phone:
             messages.error(request, 'Phone number is required.')
+            return render(request, 'tupie_app/register.html', {'form': form})
         elif form.is_valid():
             user = form.save()  # Auto-creates UserProfile via signal
             user.userprofile.phone_number = phone
@@ -67,7 +69,9 @@ def listed_items(request):
     paginator = Paginator(item_list, 8)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
+    # If AJAX refresh -> return only grid fragment
+    if request.GET.get("ajax"):
+        return render(request, "tupie_app/_items_grid.html", {"page_obj": page_obj})
     return render(request, 'tupie_app/listed_items.html', {'page_obj': page_obj})
 
 def item_detail(request, pk):
@@ -94,33 +98,76 @@ def list_item(request):
         'regions': regions,
     }
     return render(request, 'tupie_app/list_item.html', context)
-
+    
 @login_required
 def request_item(request, pk):
-    """Create a request for an item"""
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(Item, id=pk)
 
-    # Prevent owner from requesting their own item
+    # ✅ Prevent requesting your own item
     if item.owner == request.user:
         messages.error(request, "You cannot request your own item.")
-        return redirect("item_detail", pk=pk)
+        return redirect("item_detail", pk=item.id)
 
-    # Prevent duplicate requests
-    existing_request = ItemRequest.objects.filter(item=item, requester=request.user).first()
-    if existing_request:
-        messages.warning(request, "You already requested this item.")
-        return redirect("item_detail", pk=pk)
+    # ✅ Check if item is already unavailable
+    if not item.available:
+        messages.warning(request, "This item is no longer available.")
+        return redirect("item_detail", pk=item.id)
 
-    # Create the request
-    ItemRequest.objects.create(
-        item=item,
-        requester=request.user,
-        owner=item.owner,
-        message=f"{request.user.username} requested {item.title}"
+    # ✅ Prevent duplicate request from same user
+    existing = ItemRequest.objects.filter(item=item, requester=request.user)
+    if existing.exists():
+        messages.info(request, "You have already requested this item.")
+        return redirect("item_detail", pk=item.id)
+    else:
+        ItemRequest.objects.create(
+            item=item,
+            requester=request.user,
+            owner=item.owner,
+            message="Requesting this item."  # Can later add custom messages
+        )
+        messages.success(request, "✅ Your request has been sent to the owner!")
+        return redirect("outgoing_requests_dashboard")
+
+@login_required
+def requests_dashboard(request):
+    # Show only requests for the logged-in user's items
+    my_requests = ItemRequest.objects.filter(owner=request.user).select_related('item', 'requester').order_by('-created_at')
+    return render(request, "tupie_app/requests_dashboard.html", {"my_requests": my_requests})
+
+@login_required
+def update_request_status(request, request_id, action):
+    item_request = get_object_or_404(ItemRequest, id=request_id, owner=request.user)
+
+    if action == "accept":
+        item_request.status = "accepted"
+        item_request.item.available = False   # Mark as unavailable
+        item_request.item.save()              # ✅ Save the item so it's removed from listings
+        item_request.save()
+        # Decline all other pending requests for the same item
+        ItemRequest.objects.filter(item=item_request.item, status="pending").exclude(id=item_request.id).update(status="declined")
+        messages.success(request, f"You accepted {item_request.requester.username}'s request for {item_request.item.title}.")
+    elif action == "decline":
+        item_request.status = "declined"
+        item_request.save()
+        messages.warning(request, f"You declined {item_request.requester.username}'s request.")
+    else:
+        messages.error(request, "Invalid action.")
+        return redirect("requests_dashboard")
+    
+    return redirect("requests_dashboard")
+
+@login_required
+def outgoing_requests_dashboard(request):
+    my_outgoing_requests = ItemRequest.objects.filter(
+        requester=request.user
+    ).select_related('item', 'owner').order_by('-created_at')
+
+    return render(
+        request,
+        "tupie_app/outgoing_requests_dashboard.html",
+        {"my_outgoing_requests": my_outgoing_requests}
     )
 
-    messages.success(request, "Request sent successfully!")
-    return redirect("item_detail", pk=pk)
 
 def get_districts(request):
     region_id = request.GET.get('region')

@@ -1,0 +1,49 @@
+{% extends "tupie_app/base.html" %}
+{% load static %}
+{% block title %}My Requests - Tupie{% endblock %}
+
+{% block content %}
+<section class="all-items">
+  <div class="container">
+    <h1>My Outgoing Requests</h1>
+    <p>Here are the items you requested from other users.</p>
+
+    {% if my_outgoing_requests %}
+      <table class="requests-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Owner</th>
+            <th>Status</th>
+            <th>Requested On</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in my_outgoing_requests %}
+          <tr>
+            <td>
+              <a href="{% url 'item_detail' req.item.id %}">
+                {{ req.item.title }}
+              </a>
+            </td>
+            <td>{{ req.owner.username }}</td>
+            <td>
+              {% if req.status == "pending" %}
+                <span style="color: orange;">⏳ Pending</span>
+              {% elif req.status == "accepted" %}
+                <span style="color: green;">✅ Accepted</span>
+              {% else %}
+                <span style="color: red;">❌ Declined</span>
+              {% endif %}
+            </td>
+            <td>{{ req.created_at|date:"M d, Y H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No requests yet. Browse <a href="{% url 'listed_items' %}">items</a> and request one!</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
