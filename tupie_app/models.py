@@ -156,3 +156,4 @@ class ItemRequest(models.Model):
 
     def __str__(self):
         return f"{self.requester.username} → {self.item.title} ({self.status})"
+
