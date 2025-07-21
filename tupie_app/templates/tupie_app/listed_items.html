@@ -9,13 +9,8 @@
         <h1>All Available Items</h1>
         <p>Browse through all items listed by the community</p>
 
-        <div class="items-grid">
-            {% for item in page_obj %}
-                {% include "tupie_app/_item_card.html" with item=item %}
-            {% empty %}
-                <p>No items available yet. Be the first to <a href="{% url 'list_item' %}">list one!</a></p>
-            {% endfor %}
-        </div>
+        {% include "tupie_app/_items_grid.html" %}
+
         <!-- Pagination Controls -->
         {% if page_obj.has_other_pages %}
         <div class="pagination">
@@ -45,6 +40,7 @@
     
 </section>
 <script>
+<!-- ✅ Auto-refresh script -->
 document.addEventListener("DOMContentLoaded", function() {
     setInterval(() => {
         fetch("{% url 'listed_items' %}?ajax=1")
