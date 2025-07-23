@@ -24,7 +24,7 @@
               {% if req.status == "pending" %}
                 <span style="color:orange;">Pending</span>
               {% elif req.status == "accepted" %}
-                <span style="color:green;">Accepted ✅</span>
+                <span style="color:green;">Accepted  </span>
               {% else %}
                 <span style="color:red;">Declined ❌</span>
               {% endif %}
@@ -32,7 +32,7 @@
             
             {% if req.status == "pending" %}
               <div class="actions">
-                <a href="{% url 'update_request_status' req.id 'accept' %}" class="submit-btn">✅ Accept</a>
+                <a href="{% url 'update_request_status' req.id 'accept' %}" class="submit-btn">  Accept</a>
                 <a href="{% url 'update_request_status' req.id 'decline' %}" class="submit-btn" style="background:#b22222;">❌ Decline</a>
               </div>
             {% endif %}

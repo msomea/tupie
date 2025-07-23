@@ -103,17 +103,17 @@ def list_item(request):
 def request_item(request, pk):
     item = get_object_or_404(Item, id=pk)
 
-    # ✅ Prevent requesting your own item
+    #   Prevent requesting your own item
     if item.owner == request.user:
         messages.error(request, "You cannot request your own item.")
         return redirect("item_detail", pk=item.id)
 
-    # ✅ Check if item is already unavailable
+    #   Check if item is already unavailable
     if not item.available:
         messages.warning(request, "This item is no longer available.")
         return redirect("item_detail", pk=item.id)
 
-    # ✅ Prevent duplicate request from same user
+    #   Prevent duplicate request from same user
     existing = ItemRequest.objects.filter(item=item, requester=request.user)
     if existing.exists():
         messages.info(request, "You have already requested this item.")
@@ -125,7 +125,7 @@ def request_item(request, pk):
             owner=item.owner,
             message="Requesting this item."  # Can later add custom messages
         )
-        messages.success(request, "✅ Your request has been sent to the owner!")
+        messages.success(request, "  Your request has been sent to the owner!")
         return redirect("outgoing_requests_dashboard")
 
 @login_required
@@ -141,7 +141,7 @@ def update_request_status(request, request_id, action):
     if action == "accept":
         item_request.status = "accepted"
         item_request.item.available = False   # Mark as unavailable
-        item_request.item.save()              # ✅ Save the item so it's removed from listings
+        item_request.item.save()              #   Save the item so it's removed from listings
         item_request.save()
         # Decline all other pending requests for the same item
         ItemRequest.objects.filter(item=item_request.item, status="pending").exclude(id=item_request.id).update(status="declined")

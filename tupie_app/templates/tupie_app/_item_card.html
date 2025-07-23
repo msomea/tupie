@@ -2,7 +2,7 @@
 
 <div class="item-card">
 
-    <!-- ✅ Item Image -->
+    <!--   Item Image -->
     <div class="item-image">
         {% if item.image %}
             <img src="{{ item.image.url }}" alt="{{ item.title }}">
@@ -11,28 +11,28 @@
         {% endif %}
     </div>
 
-    <!-- ✅ Title & Description -->
+    <!--   Title & Description -->
     <h3>{{ item.title }}</h3>
     <p>{{ item.description|truncatewords:15 }}</p>
 
-    <!-- ✅ Category -->
+    <!--   Category -->
     <small><strong>Category:</strong> {{ item.get_category_display }}</small><br>
 
-    <!-- ✅ Owner + Verification Badge -->
+    <!--   Owner + Verification Badge -->
     <p>
         <strong class="owner">👤:</strong> {{ item.owner.username }}
         {% include 'tupie_app/_verification_badge.html' with user_profile=item.owner.userprofile %}
     </p>
-    <!-- ✅ Availability status -->
+    <!--   Availability status -->
         {% if item.available %}
-            <span class="status available">✅ Available</span>
+            <span class="status available">  Available</span>
         {% else %}
             <span class="status unavailable">❌ Taken</span>
         {% endif %}
         <br>
 
 
-    <!-- ✅ Improved Location Display -->
+    <!--   Improved Location Display -->
     {% if item.street or item.place or item.ward or item.district or item.region %}
     <p class="location">
         <small>
@@ -59,7 +59,7 @@
     {% endif %} <br>
 
 
-    <!-- ✅ Details Button -->
+    <!--   Details Button -->
 
     <a href="{% url 'item_detail' item.pk %}" class="cta-btn">View Details</a>
 </div>

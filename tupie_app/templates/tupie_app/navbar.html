@@ -2,31 +2,31 @@
 
 <nav class="navbar">
     <div class="logo">
-        <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Tupie Logo">
+        <a href="{% url 'home' %}">
+        <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Logo">
         <span class="logo-text">Tupie</span>
+        </a>
     </div>
 
-    <ul class="nav-links">
-        <!-- Always visible links -->
-        <li><a href="{% url 'home' %}">Home</a></li>
-        <li><a href="{% url 'list_item' %}">List Item</a></li>
-        <li><a href="{% url 'listed_items' %}">Browse All</a></li>
-        <li><a href="{% url 'about' %}">About</a></li>
-        <li><a href="{% url 'donation' %}">Donation</a></li>
+  <!-- Desktop & Mobile Nav Links -->
+  <div class="nav-links" id="navMenu">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'listed_items' %}">Items</a>
+    <a href="{% url 'about' %}">About</a>
+    <a href="{% url 'donation' %}">Donation</a>
 
-        <!-- Auth-dependent links -->
-        {% if user.is_authenticated %}
-        <li>
-                <span class="welcome-text">{{ user.username }}
-                {% include 'tupie_app/_verification_badge.html' %}
-                <li><a href="{% url 'requests_dashboard' %}">Requests</a></li>
-                <li><a href="{% url 'outgoing_requests_dashboard' %}">My Requests</a></li>
-                </span>
-        </li>
-            <li><a href="{% url 'logout' %}" class="logout-link">Logout</a></li>
-        {% else %}
-            <li><a href="{% url 'login' %}">Login</a></li>
-            <li><a href="{% url 'signup' %}">Sign Up</a></li>
-        {% endif %}
-    </ul>
+    {% if user.is_authenticated %}
+      <a href="{% url 'requests_dashboard' %}">Requests</a>
+      <a href="{% url 'outgoing_requests_dashboard' %}">My Requests</a>
+      <a href="{% url 'logout' %}">
+        {{ user.username }}
+        {% include "tupie_app/_verification_badge.html" with user_profile=user.userprofile %}
+      </a>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+  </div>
+
+  <!-- ✅ Hamburger for Mobile -->
+  <button class="menu-toggle" id="menuToggle">☰</button>
 </nav>
