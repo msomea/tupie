@@ -26,14 +26,16 @@
                 {{ req.item.title }}
               </a>
             </td>
-            <td>{{ req.owner.username }}</td>
+            <td>{{ req.owner.username }}
+              {% include "tupie_app/_verification_badge.html" with user_profile=req.owner.userprofile %}
+            </td>
             <td>
               {% if req.status == "pending" %}
-                <span style="color: orange;">⏳ Pending</span>
+                <span class="pending">⏳ Pending</span>
               {% elif req.status == "accepted" %}
-                <span style="color: green;">  Accepted</span>
+                <span class="accepted">✔ Accepted</span>
               {% else %}
-                <span style="color: red;">❌ Declined</span>
+                <span class="declined">❌ Declined</span>
               {% endif %}
             </td>
             <td>{{ req.created_at|date:"M d, Y H:i" }}</td>

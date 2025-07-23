@@ -16,7 +16,7 @@
     <p>{{ item.description|truncatewords:15 }}</p>
 
     <!--   Category -->
-    <small><strong>Category:</strong> {{ item.get_category_display }}</small><br>
+    <small><strong>Category:</strong> {{ item.get_category_display }}</small>
 
     <!--   Owner + Verification Badge -->
     <p>
@@ -29,7 +29,7 @@
         {% else %}
             <span class="status unavailable">❌ Taken</span>
         {% endif %}
-        <br>
+        
 
 
     <!--   Improved Location Display -->
@@ -56,7 +56,7 @@
     </p>
     {% else %}
         <p class="location"><em>No location provided</em></p>
-    {% endif %} <br>
+    {% endif %}
 
 
     <!--   Details Button -->
