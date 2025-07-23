@@ -4,12 +4,14 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Item, Region, District, Ward, Place, UserProfile, ItemRequest
 from django.core.paginator import Paginator
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from .forms import ItemForm, SignUpForm
 from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch
+from django.template.loader import render_to_string
+from django.db.models import Q
 
 
 # Create your views here.
@@ -69,10 +71,13 @@ def listed_items(request):
     paginator = Paginator(item_list, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    # ✅ Get category choices from model
+    categories = Item._meta.get_field("category").choices 
     # If AJAX refresh -> return only grid fragment
     if request.GET.get("ajax"):
-        return render(request, "tupie_app/_items_grid.html", {"page_obj": page_obj})
-    return render(request, 'tupie_app/listed_items.html', {'page_obj': page_obj})
+        return render(request, "tupie_app/_items_grid.html", {"page_obj": page_obj, 'categories': categories })
+    return render(request, 'tupie_app/listed_items.html', {'page_obj': page_obj, 'categories': categories })
+  
 
 def item_detail(request, pk):
     """Show full details of a single item"""
@@ -168,7 +173,7 @@ def outgoing_requests_dashboard(request):
         {"my_outgoing_requests": my_outgoing_requests}
     )
 
-
+# AJAX Search for items
 def get_districts(request):
     region_id = request.GET.get('region')
     districts = District.objects.filter(region_id=region_id).order_by('district_name').values('district_code', 'district_name')
@@ -183,3 +188,27 @@ def get_places(request):
     ward_id = request.GET.get('ward')
     places = Place.objects.filter(ward_id=ward_id).order_by('place_name').values('id', 'place_name')
     return JsonResponse(list(places), safe=False)
+
+def search_items(request):
+    query = request.GET.get("q", "").strip()
+    category_filter = request.GET.get("category", "").strip()
+
+    items = Item.objects.filter(available=True)
+
+    if query:
+        items = items.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(region__region_name__icontains=query) |
+            Q(district__district_name__icontains=query) |
+            Q(ward__ward_name__icontains=query)
+        )
+
+    if category_filter:
+        items = items.filter(category=category_filter)
+
+    items = items.order_by("-created_at")[:30]  # Limit for AJAX
+
+    # Render only the grid part
+    html = render_to_string("tupie_app/partials/items_grid.html", {"items": items})
+    return HttpResponse(html)

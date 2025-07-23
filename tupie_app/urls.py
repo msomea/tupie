@@ -30,6 +30,10 @@ urlpatterns = [
     path("get_districts/", views.get_districts, name="get_districts"),
     path("get_wards/", views.get_wards, name="get_wards"),
     path("get_places/", views.get_places, name="get_places"),
+
+    # Search for items
+    path("search-items/", views.search_items, name="search_items"),
+
 ]
 
 # Serve media files in development

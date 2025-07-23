@@ -1,61 +1,67 @@
 {% extends 'tupie_app/base.html' %}
 {% load static %}
-
 {% block title %}Available Items - Tupie{% endblock %}
 
 {% block content %}
 <section class="all-items">
-    <div class="container">
-        <h1>All Available Items</h1>
-        <p>Browse through all items listed by the community</p>
+  <div class="container">
+    <h1>All Available Items</h1>
+    <p>Browse through all items listed by the community</p>
 
-        {% include "tupie_app/_items_grid.html" %}
+    <!-- ✅ Search & Filter Form -->
+    <form id="live-search-form" class="filter-form" onsubmit="return false;">
+      <input 
+        type="text" 
+        name="q" 
+        id="search-query"
+        placeholder="Search by title or location...">
 
-        <!-- Pagination Controls -->
-        {% if page_obj.has_other_pages %}
-        <div class="pagination">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}">« Previous</a>
-            {% else %}
-                <span class="disabled">« Previous</span>
-            {% endif %}
+      <select name="category" id="search-category">
+        <option value="">All Categories</option>
+        {% for value, label in categories %}
+          <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+      </select>
 
-            <!-- Page Numbers -->
-            {% for num in page_obj.paginator.page_range %}
-                {% if num == page_obj.number %}
-                    <span class="active">{{ num }}</span>  <!-- current page -->
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <a href="?page={{ num }}">{{ num }}</a>
-                {% endif %}
-            {% endfor %}
+      <button type="button" id="search-btn">🔍 Search</button>
+    </form>
 
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Next »</a>
-            {% else %}
-                <span class="disabled">Next »</span>
-            {% endif %}
-        </div>
-        {% endif %}
+    <!-- ✅ AJAX results -->
+    <div id="items-container">
+      <div class="items-grid">
+        {% for item in page_obj %}
+          {% include "tupie_app/_item_card.html" %}
+        {% empty %}
+          <p>No items found.</p>
+        {% endfor %}
+      </div>
     </div>
-    
+  </div>
 </section>
+
+<!-- ✅ JS for live search -->
 <script>
-<!--   Auto-refresh script -->
 document.addEventListener("DOMContentLoaded", function() {
-    setInterval(() => {
-        fetch("{% url 'listed_items' %}?ajax=1")
-            .then(response => response.text())
-            .then(html => {
-                // Replace the items grid only
-                const parser = new DOMParser();
-                const newDoc = parser.parseFromString(html, "text/html");
-                const newGrid = newDoc.querySelector(".items-grid");
-                if (newGrid) {
-                    document.querySelector(".items-grid").innerHTML = newGrid.innerHTML;
-                }
-            });
-    }, 15000); // refresh every 15 seconds
+  const queryInput = document.getElementById("search-query");
+  const categorySelect = document.getElementById("search-category");
+  const searchBtn = document.getElementById("search-btn");
+  const itemsContainer = document.getElementById("items-container");
+
+  function fetchFilteredItems() {
+    const query = queryInput.value;
+    const category = categorySelect.value;
+
+    fetch(`/search-items/?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}`)
+      .then(response => response.text())
+      .then(html => {
+        itemsContainer.innerHTML = html; // Replace with new filtered grid
+      });
+  }
+
+  // Trigger search on typing, selecting, or clicking button
+  queryInput.addEventListener("input", fetchFilteredItems);
+  categorySelect.addEventListener("change", fetchFilteredItems);
+  searchBtn.addEventListener("click", fetchFilteredItems);
 });
 </script>
-
 {% endblock %}

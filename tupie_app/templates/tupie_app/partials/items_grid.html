@@ -1,0 +1,7 @@
+<div class="items-grid">
+  {% for item in items %}
+    {% include "tupie_app/_item_card.html" %}
+  {% empty %}
+    <p>No items found.</p>
+  {% endfor %}
+</div>

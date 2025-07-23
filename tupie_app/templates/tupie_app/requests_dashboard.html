@@ -1,44 +1,55 @@
-{% extends 'tupie_app/base.html' %}
+{% extends "tupie_app/base.html" %}
 {% load static %}
-{% block title %}Requests Dashboard{% endblock %}
+{% block title %}Incoming Requests - Tupie{% endblock %}
 
 {% block content %}
 <section class="requests-dashboard">
   <div class="container">
-    <h1>Requests for Your Items</h1>
+    <h1>Incoming Requests</h1>
+    <p>These are requests made for your items. Accept or decline them.</p>
 
     {% if my_requests %}
-      <div class="items-grid">
-        {% for req in my_requests %}
-          <div class="item-card">
-            <h3>{{ req.item.title }}</h3>
-            <p>
-              <strong>From:</strong> {{ req.requester.username }}
-              {% include 'tupie_app/_verification_badge.html' with user_profile=req.requester.userprofile %}
-            </p>
-            <p>
-              <strong>Message:</strong>
-              {% if req.message %}{{ req.message }}{% else %}<em>No message</em>{% endif %}
-            </p>
-            <p><strong>Status:</strong> 
+      <table class="requests-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Requester</th>
+            <th>Status</th>
+            <th>Requested On</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in my_requests %}
+          <tr>
+            <td>
+              <a href="{% url 'item_detail' req.item.id %}">
+                {{ req.item.title }}
+              </a>
+            </td>
+            <td>{{ req.requester.username }}</td>
+            <td>
               {% if req.status == "pending" %}
-                <span style="color:orange;">Pending</span>
+                <span style="color: orange;">⏳ Pending</span>
               {% elif req.status == "accepted" %}
-                <span style="color:green;">Accepted  </span>
+                <span style="color: green;">✅ Accepted</span>
               {% else %}
-                <span style="color:red;">Declined ❌</span>
+                <span style="color: red;">❌ Declined</span>
               {% endif %}
-            </p>
-            
-            {% if req.status == "pending" %}
-              <div class="actions">
-                <a href="{% url 'update_request_status' req.id 'accept' %}" class="submit-btn">  Accept</a>
-                <a href="{% url 'update_request_status' req.id 'decline' %}" class="submit-btn" style="background:#b22222;">❌ Decline</a>
-              </div>
-            {% endif %}
-          </div>
-        {% endfor %}
-      </div>
+            </td>
+            <td>{{ req.created_at|date:"M d, Y H:i" }}</td>
+            <td>
+              {% if req.status == "pending" %}
+                <a href="{% url 'update_request_status' req.id 'accept' %}" class="btn-accept">✅ Accept</a>
+                <a href="{% url 'update_request_status' req.id 'decline' %}" class="btn-decline">❌ Decline</a>
+              {% else %}
+                <span style="color: #777;">No actions</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     {% else %}
       <p>No one has requested your items yet.</p>
     {% endif %}
