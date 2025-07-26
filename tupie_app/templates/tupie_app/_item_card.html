@@ -20,8 +20,11 @@
 
     <!--   Owner + Verification Badge -->
     <p>
-        <strong class="owner">👤:</strong> {{ item.owner.username }}
+        <strong>👤:</strong>
+        <a href="{% url 'owner_profile' item.owner.id %}"class="owner">
+        {{ item.owner.username }}</a>
         {% include 'tupie_app/_verification_badge.html' with user_profile=item.owner.userprofile %}
+        
     </p>
     <!--   Availability status -->
         {% if item.available %}

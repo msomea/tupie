@@ -1,0 +1,38 @@
+{% extends 'tupie_app/base.html' %}
+{% load static %}
+{% block title %}Profile View{% endblock %}
+{% block content %}
+<div class="owner-card">
+    {% if owner.photo %}
+        <img src="{{ owner.photo.url }}" alt="Profile Photo" class="profile-avatar">
+    {% else %}
+        <img src="{% static 'tupie_app/media/images/avatar.png' %}" alt="Default Avatar" class="profile-avatar">
+    {% endif %}
+  
+  <h2>
+    {{ owner.user.username }}
+    {% include 'tupie_app/_verification_badge.html' with user_profile=owner %}
+  </h2>
+
+  <p><strong>Phone:</strong> {{ owner.phone_number }}</p>
+  <p><strong>Email:</strong> {{ owner.user.email }}</p>
+
+    {% if owner.place or owner.ward or owner.district or owner.region %}
+    <p><strong>Location:</strong> 
+        <small>
+        {{ owner.place|default_if_none:"" }},
+        {{ owner.ward|default_if_none:"" }},
+        {{ owner.district|default_if_none:"" }},
+        {{ owner.region|default_if_none:"" }}
+        </small>
+    </p>
+    {% else %}
+    <p><strong>Location:</strong> Not provided yet</p>
+    {% endif %}
+
+  <!-- Placeholder for future messaging -->
+  <button disabled class="bg-gray-400 text-white px-4 py-2 rounded">
+    Message (coming soon)
+  </button>
+</div>
+{% endblock %}

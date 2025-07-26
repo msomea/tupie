@@ -27,13 +27,14 @@
     <p><strong>Category:</strong> {{ item.get_category_display }}</p>
 
     <p><strong>Listed by:</strong>
-        {{ item.owner.username }}
+        <a href="{% url 'owner_profile' item.owner.id %}"class="owner">
+        {{ item.owner.username }}</a>
         {% include "tupie_app/_verification_badge.html" with user_profile=item.owner.userprofile %}
     </p>
 
     <p>
         {% if item.available %}
-            <span class="status available">  Available</span>
+            <span class="status available">✅ Available</span>
         {% else %}
             <span class="status unavailable">❌ Taken</span>
         {% endif %}

@@ -26,7 +26,8 @@
                 {{ req.item.title }}
               </a>
             </td>
-            <td>{{ req.owner.username }}
+            <td>
+             {{ req.owner.username }}
               {% include "tupie_app/_verification_badge.html" with user_profile=req.owner.userprofile %}
             </td>
             <td>

@@ -296,6 +296,29 @@ html, body {
 .item-card .location small span {
     color: #aaa;  /*   lighter arrows */
 }
+/* ✅ Owner name on item card */
+.owner {
+  font-size: 0.9rem;        /* slightly smaller than title */
+  font-weight: bold;
+  color: #4A704A;           /* theme green */
+  margin: 5px 0;            /* small spacing */
+  display: inline-block;    /* keeps badge aligned properly */
+  text-decoration: none;    /* remove link underline */
+  transition: color 0.3s ease;
+}
+
+.owner:hover {
+  color: #3A5A3A;           /* darker on hover */
+  text-decoration: underline; /* subtle hover effect */
+}
+
+/* Keep badge aligned nicely */
+.item-card .owner .badge {
+  font-size: 0.8rem;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
 
 /* ✅ Requests Table Section */
 .requests-table {
@@ -659,3 +682,62 @@ footer {
     text-align: center;
     margin-top: 20px;
 }
+
+/* ✅ Owner Profile Card */
+.owner-card {
+  background: #FFF;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 320px;          /* default width for desktop */
+  max-width: 90%;        /* ✅ makes it shrink on small screens */
+  margin: 40px auto;     /* center it horizontally */
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.owner-card:hover {
+  background: #F5E8D5;
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* ✅ Profile name styling */
+.owner-card h2 {
+  color: #4A704A;
+  font-size: 1.3rem;
+  margin: 10px 0;
+}
+
+/* ✅ Contact details */
+.owner-card p {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 6px 0;
+}
+
+/* ✅ Profile image centered & rounded */
+.owner-card img.profile-avatar {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #4A704A;
+  margin-bottom: 15px;
+}
+
+/* ✅ Extra small screen fix */
+@media (max-width: 480px) {
+  .owner-card {
+    width: 95%;        /* take almost full width on very small screens */
+    padding: 15px;
+  }
+  .owner-card img.profile-avatar {
+    width: 100px;      /* slightly smaller avatar on small screens */
+    height: 100px;
+  }
+  .owner-card h2 {
+    font-size: 1.1rem; /* smaller text for compact fit */
+  }
+}
+

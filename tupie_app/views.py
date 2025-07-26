@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, resolve_url
+from django.shortcuts import render, redirect, resolve_url, get_object_or_404
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Item, Region, District, Ward, Place, UserProfile, ItemRequest
@@ -8,7 +8,6 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from .forms import ItemForm, SignUpForm, UserProfileUpdateForm
-from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch
 from django.template.loader import render_to_string
 from django.db.models import Q
@@ -85,6 +84,11 @@ def login_view(request):
 def logout_view(request):
     auth_logout(request)
     return redirect('home')
+
+
+def owner_profile(request, user_id):
+    owner = get_object_or_404(UserProfile, user__id=user_id)
+    return render(request, 'tupie_app/owner_profile.html', {'owner': owner})
 
 def listed_items(request):
     item_list = Item.objects.filter(available=True).order_by('-created_at')
