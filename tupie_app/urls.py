@@ -2,6 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from .views import user_profile_update
 
 urlpatterns = [
     # Home & static pages
@@ -13,6 +14,9 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+
+    # Profile update
+    path('profile/update/', user_profile_update, name='user_profile_update'),
 
     # Item listing
     path('list_item/', views.list_item, name='list_item'),

@@ -129,9 +129,18 @@ class Item(models.Model):
     
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="userprofile")
+    
+    full_name = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)
+    
+    region = models.ForeignKey('Region', on_delete=models.SET_NULL, blank=True, null=True)
+    district = models.ForeignKey('District', on_delete=models.SET_NULL, blank=True, null=True)
+    ward = models.ForeignKey('Ward', on_delete=models.SET_NULL, blank=True, null=True)
+    place = models.ForeignKey('Place', on_delete=models.SET_NULL, blank=True, null=True)
+    
+    id_document = models.ImageField(upload_to='verification_ids/', blank=True, null=True)
     verification_status = models.CharField(
         max_length=20,
         choices=VERIFICATION_CHOICES,
@@ -140,6 +149,7 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s profile"
+
     
 # Item request model
 class ItemRequest(models.Model):

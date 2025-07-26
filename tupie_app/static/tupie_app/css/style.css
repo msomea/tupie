@@ -448,11 +448,68 @@ html, body {
 }
 .item-form input,
 .item-form select,
-.item-form textarea {
+.item-form textarea,
+.profile-form input,
+.profile-form select {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 6px;
 }
+
+/* ✅ Profile page preview styling */
+.profile-preview {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.profile-avatar,
+.id-preview {
+  width: 120px;        /* fixed size */
+  height: 120px;       /* keep square shape */
+  object-fit: cover;   /* crop & center image */
+  border-radius: 50%;  /* makes it circular */
+  border: 3px solid #4A704A; /* match theme color */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin: 10px auto;
+  display: block;      /* center align */
+}
+
+/* ✅ For ID Document (can stay rectangular) */
+.id-preview {
+  width: 200px;
+  height: auto;
+  border-radius: 10px;  /* slight rounded corners */
+}
+
+/* ✅ Form grid styling (same theme) */
+.profile-form .form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.profile-form label {
+  font-weight: bold;
+  color: #4A704A;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* ✅ Submit button matches theme */
+.profile-form .submit-btn {
+  background: #4A704A;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.profile-form .submit-btn:hover {
+  background: #3A5A3A;
+}
+
 
 
 /* Pagination */

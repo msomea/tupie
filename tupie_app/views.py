@@ -7,11 +7,12 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from .forms import ItemForm, SignUpForm
+from .forms import ItemForm, SignUpForm, UserProfileUpdateForm
 from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch
 from django.template.loader import render_to_string
 from django.db.models import Q
+from django.db import IntegrityError
 
 
 # Create your views here.
@@ -25,6 +26,7 @@ def about(request):
 def donation(request):
     return render(request, 'tupie_app/donation.html')
 
+
 def signup(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -32,19 +34,37 @@ def signup(request):
         password = request.POST.get('password1')
 
         form = UserCreationForm(request.POST)
+
+        # ✅ Validate phone number is provided
         if not phone:
             messages.error(request, 'Phone number is required.')
             return render(request, 'tupie_app/register.html', {'form': form})
-        elif form.is_valid():
-            user = form.save()  # Auto-creates UserProfile via signal
-            user.userprofile.phone_number = phone
-            user.userprofile.save()
 
-            auth_login(request, user)
-            messages.success(request, 'Account created & logged in!')
-            return redirect('home')
+        # ✅ Check if phone already exists before saving user
+        if UserProfile.objects.filter(phone_number=phone).exists():
+            messages.error(request, 'This phone number is already registered. Please use another one.')
+            return render(request, 'tupie_app/register.html', {'form': form})
+
+        if form.is_valid():
+            try:
+                # ✅ Create user normally
+                user = form.save()  # Auto-creates UserProfile via signal
+                user.userprofile.phone_number = phone
+                user.userprofile.save()
+
+                # ✅ Auto login
+                auth_login(request, user)
+                messages.success(request, 'Account created & logged in!')
+                return redirect('home')
+
+            except IntegrityError:
+                # ✅ Fallback: If race condition still triggers DB unique error
+                messages.error(request, 'This phone number is already registered.')
+                return render(request, 'tupie_app/register.html', {'form': form})
+
         else:
             messages.error(request, 'Please fix the errors below.')
+
     else:
         form = UserCreationForm()
 
@@ -225,3 +245,25 @@ def search_items(request):
     # Render only the grid part
     html = render_to_string("tupie_app/partials/items_grid.html", {"items": items})
     return HttpResponse(html)
+
+@login_required
+def user_profile_update(request):
+    profile = request.user.userprofile
+    
+    if request.method == "POST":
+        form = UserProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            updated_profile = form.save(commit=False)
+
+            # If user uploads an ID, set status to pending
+            if 'id_document' in request.FILES:
+                updated_profile.verification_status = 'pending'
+                messages.info(request, "Your verification is now pending review.")
+
+            updated_profile.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect('user_profile_update')  # reload page after save
+    else:
+        form = UserProfileUpdateForm(instance=profile)
+
+    return render(request, 'tupie_app/user_profile_update.html', {'form': form})

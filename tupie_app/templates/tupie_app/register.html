@@ -5,6 +5,11 @@
 
 {% block content %}
 <section class="form-section">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
     <h2>Create an Account</h2>
 
     <form method="post" class="item-form">
