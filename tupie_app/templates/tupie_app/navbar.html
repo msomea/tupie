@@ -24,6 +24,7 @@
         {% include "tupie_app/_verification_badge.html" with user_profile=user.userprofile %}
       </a>
     {% else %}
+    <a href="{% url 'signup' %}">Signup</a>
       <a href="{% url 'login' %}">Login</a>
     {% endif %}
   </div>
