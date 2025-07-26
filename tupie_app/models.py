@@ -8,7 +8,8 @@ from django.utils import timezone
 VERIFICATION_CHOICES = [
     ('unverified', 'Unverified'),
     ('verified', 'Verified User'),
-    ('organization', 'Organization'),
+    ('organization', 'Verified Organization'),
+    ('administrator', 'Administrator'),
 ]
 
 # Country
@@ -94,6 +95,7 @@ class Street(models.Model):
 
 class Item(models.Model):
     CATEGORY_CHOICES = [
+        ("beverages", "Beverages"),
         ("books", 'Books'),
         ('clothing', 'Clothing'),
         ('electronic', 'Electronic'),

@@ -6,6 +6,9 @@
 {% elif user_profile.verification_status == "organization" %}
   <sup class="badge gold-check" title="Verified Organization">💎</sup>
 
+{% elif user_profile.verification_status == "administrator" %}
+  <sup class="badge gold-check" title="Administrator">👑</sup>
+
 {% else %}
   {# Unverified - no badge #}
 {% endif %}

@@ -41,8 +41,10 @@
     </p>
 
     <p><strong>Location:</strong>
-        {% if item.street %}{{ item.street }}, {% endif %}
-        {% if item.district %}{{ item.district.district_name }}, {% endif %}
+        {% if item.street %}{{ item.street }},{% endif %}
+        {% if item.place %}{{ item.place.place_name }},{% endif %}
+        {% if item.ward %}{{ item.ward.ward_name }},{% endif %}
+        {% if item.district %}{{ item.district.district_name }},{% endif %}
         {% if item.region %}{{ item.region.region_name }}{% endif %}
     </p>
 
