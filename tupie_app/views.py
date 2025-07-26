@@ -185,9 +185,22 @@ def get_wards(request):
     return JsonResponse(list(wards), safe=False)
 
 def get_places(request):
-    ward_id = request.GET.get('ward')
-    places = Place.objects.filter(ward_id=ward_id).order_by('place_name').values('id', 'place_name')
-    return JsonResponse(list(places), safe=False)
+    ward_id = request.GET.get("ward")
+    if not ward_id:
+        return JsonResponse([], safe=False)
+
+    # Get all places for that ward
+    places = Place.objects.filter(ward_id=ward_id).values("id", "place_name")
+
+    unique_places = []
+    seen_names = set()
+
+    for p in places:
+        if p["place_name"] not in seen_names:
+            seen_names.add(p["place_name"])
+            unique_places.append(p)  # Keep the first occurrence (valid id)
+
+    return JsonResponse(unique_places, safe=False)
 
 def search_items(request):
     query = request.GET.get("q", "").strip()
