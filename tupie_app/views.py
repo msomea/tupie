@@ -1,17 +1,19 @@
 from django.shortcuts import render, redirect, resolve_url, get_object_or_404
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Item, Region, District, Ward, Place, UserProfile, ItemRequest
+from django.contrib.auth.models import User
+from .models import Item, Region, District, Ward, Place, UserProfile, ItemRequest, Message
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from .forms import ItemForm, SignUpForm, UserProfileUpdateForm
+from .forms import ItemForm, SignUpForm, UserProfileUpdateForm, MessageForm
 from django.db.models import Prefetch
 from django.template.loader import render_to_string
 from django.db.models import Q
 from django.db import IntegrityError
+
 
 
 # Create your views here.
@@ -34,30 +36,30 @@ def signup(request):
 
         form = UserCreationForm(request.POST)
 
-        # ✅ Validate phone number is provided
+        #  Validate phone number is provided
         if not phone:
             messages.error(request, 'Phone number is required.')
             return render(request, 'tupie_app/register.html', {'form': form})
 
-        # ✅ Check if phone already exists before saving user
+        #  Check if phone already exists before saving user
         if UserProfile.objects.filter(phone_number=phone).exists():
             messages.error(request, 'This phone number is already registered. Please use another one.')
             return render(request, 'tupie_app/register.html', {'form': form})
 
         if form.is_valid():
             try:
-                # ✅ Create user normally
+                #  Create user normally
                 user = form.save()  # Auto-creates UserProfile via signal
                 user.userprofile.phone_number = phone
                 user.userprofile.save()
 
-                # ✅ Auto login
+                #  Auto login
                 auth_login(request, user)
                 messages.success(request, 'Account created & logged in!')
                 return redirect('home')
 
             except IntegrityError:
-                # ✅ Fallback: If race condition still triggers DB unique error
+                #  Fallback: If race condition still triggers DB unique error
                 messages.error(request, 'This phone number is already registered.')
                 return render(request, 'tupie_app/register.html', {'form': form})
 
@@ -95,7 +97,7 @@ def listed_items(request):
     paginator = Paginator(item_list, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    # ✅ Get category choices from model
+    #  Get category choices from model
     categories = Item._meta.get_field("category").choices 
     # If AJAX refresh -> return only grid fragment
     if request.GET.get("ajax"):
@@ -104,7 +106,7 @@ def listed_items(request):
   
 
 def item_detail(request, pk):
-    """Show full details of a single item"""
+    #Show full details of a single item
     item = get_object_or_404(Item, pk=pk)
     return render(request, "tupie_app/item_detail.html", {"item": item})
 
@@ -271,3 +273,57 @@ def user_profile_update(request):
         form = UserProfileUpdateForm(instance=profile)
 
     return render(request, 'tupie_app/user_profile_update.html', {'form': form})
+
+@login_required
+def send_message(request, receiver_id):
+    receiver = get_object_or_404(User, id=receiver_id)
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.receiver = receiver
+            message.save()
+            return redirect('inbox')
+    else:
+        form = MessageForm()
+    return render(request, 'tupie_app/messages/send_message.html', {'form': form, 'receiver': receiver})
+
+@login_required
+def inbox(request):
+    # Fetch all messages received by user
+    messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+    # Mark all unread messages as read when user opens inbox
+    messages.filter(is_read=False).update(is_read=True)
+    unread_count = 0
+    if request.user.is_authenticated:
+        unread_count = request.user.received_messages.filter(is_read=False).count()
+
+    context = {
+        # your existing context variables...
+        'unread_count': unread_count,
+    }
+    return render(request, 'tupie_app/messages/inbox.html', {'messages': messages})
+
+@login_required
+def conversation(request, user_id):
+    other_user = get_object_or_404(User, id=user_id)
+    messages = Message.objects.filter(
+        sender__in=[request.user, other_user],
+        receiver__in=[request.user, other_user]
+    ).order_by('timestamp')
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.receiver = other_user
+            message.save()
+            return redirect('conversation', user_id=other_user.id)
+    else:
+        form = MessageForm()
+    return render(request, 'tupie_app/messages/conversation.html', {
+        'messages': messages,
+        'form': form,
+        'other_user': other_user
+    })

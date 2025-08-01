@@ -29,7 +29,7 @@ class Country(models.Model):
     def __str__(self):
         return self.name
 
-# Region - Place
+# Region level to Place level
 class Region(models.Model):
     region_code = models.IntegerField(primary_key=True)
     region_name = models.TextField()
@@ -169,3 +169,16 @@ class ItemRequest(models.Model):
     def __str__(self):
         return f"{self.requester.username} → {self.item.title} ({self.status})"
 
+# Message model
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"From {self.sender.username} to {self.receiver.username}"

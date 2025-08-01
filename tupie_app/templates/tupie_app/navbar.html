@@ -19,6 +19,14 @@
       <a href="{% url 'list_item' %}">Add Item</a>
       <a href="{% url 'requests_dashboard' %}">Requests</a>
       <a href="{% url 'outgoing_requests_dashboard' %}">My Requests</a>
+      <a href="{% url 'inbox' %}" class="relative inline-block">
+        <img src="{% static 'tupie_app/media/icons/email.ico' %}" alt="Inbox" class="inbox-icon">
+        {% if unread_count > 0 %}
+          <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+            {{ unread_count }}
+          </span>
+        {% endif %}
+      </a>
       <a href="{% url 'user_profile_update' %}">
         {{ user.username }}
         {% include "tupie_app/_verification_badge.html" with user_profile=user.userprofile %}
@@ -30,6 +38,6 @@
     {% endif %}
   </div>
 
-  <!-- ✅ Hamburger for Mobile -->
+  <!--  Hamburger for Mobile -->
   <button class="menu-toggle" id="menuToggle">☰</button>
 </nav>

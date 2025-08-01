@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tupie_app.apps.TupieAppConfig',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
@@ -39,6 +40,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'tupie_app.context_processors.unread_message_count',  # Custom context processor for unread messages
             ],
         },
     },
@@ -52,7 +54,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'locations',
         'USER': 'postgres',
-        'PASSWORD': 'msomea',  # change to your actual password
+        'PASSWORD': 'msomea', 
         'HOST': 'localhost',
         'PORT': '5432',
     },

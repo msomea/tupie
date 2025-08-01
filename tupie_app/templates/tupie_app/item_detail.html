@@ -13,7 +13,7 @@
   </div>
 {% endif %}
 
-    <h1>{{ item.title }}</h1>
+    <h1 style="text-transform: uppercase;">{{ item.title }}</h1>
     <div class="item-image">
         {% if item.image %}
             <img src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width:400px;border-radius:8px;">
@@ -34,7 +34,7 @@
 
     <p>
         {% if item.available %}
-            <span class="status available">✅ Available</span>
+            <span class="status available"> Available</span>
         {% else %}
             <span class="status unavailable">❌ Taken</span>
         {% endif %}
@@ -61,7 +61,7 @@
                 <a href="{% url 'request_item' item.id %}"><button class="cta-btn">Request</button></a>
             {% endif %}
         {% else %}
-            <a href="{% url 'login' %}" class="cta-btn">Login to Request</a>
+            <a href="{% url 'login' %}"><button class="cta-btn">Login to Request</button></a>
         {% endif %}
 
         

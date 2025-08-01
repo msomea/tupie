@@ -7,7 +7,7 @@
 <section class="form-section">
   <h1>Update Your Profile</h1>
 
-  <!-- ✅ Display current profile picture -->
+  <!--  Display current profile picture -->
     <div class="profile-preview">
     <h3>Current Profile Picture</h3>
     {% if user.userprofile.photo %}
@@ -17,7 +17,7 @@
     {% endif %}
     </div>
 
-  <!-- ✅ Display current ID document -->
+  <!--  Display current ID document -->
     <div class="id-preview-container">
     <h3>Uploaded ID Document</h3>
     {% if user.userprofile.id_document %}
@@ -27,7 +27,7 @@
     {% endif %}
     </div>
 
-  <!-- ✅ Profile update form -->
+  <!--  Profile update form -->
   <form method="POST" enctype="multipart/form-data" class="profile-form">
     {% csrf_token %}
     
@@ -50,18 +50,20 @@
 
   <hr>
 
-  <!-- ✅ Show current verification badge -->
+  <!--  Show current verification badge -->
   <h3>Verification Status</h3>
-  {% include "tupie_app/_verification_badge.html" with user_profile=request.user.userprofile %}
-  
-  {% if request.user.userprofile.verification_status == "pending" %}
+  {% if request.user.userprofile.verification_status == "verified" %}
+    <p>Verified as: 
+    {% include "tupie_app/_verification_badge.html" with user_profile=request.user.userprofile %}
+    </p>
+  {% elif request.user.userprofile.verification_status == "pending" %}
     <p style="color: orange;">⏳ Your ID is under review</p>
   {% elif request.user.userprofile.verification_status == "unverified" %}
     <p style="color: red;">❌ You are not verified yet</p>
   {% endif %}
 </section>
 
-<!-- ✅ Cascading dropdown AJAX -->
+<!--  Cascading dropdown AJAX -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const regionSelect = document.getElementById("id_region");
@@ -141,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
           .then(data => {
               clearOptions(placeSelect, "-- Select Place --");
 
-              // ✅ remove duplicates
+              //  remove duplicates
               const uniquePlaces = new Set();
               data.forEach(p => {
                   if (!uniquePlaces.has(p.place_name)) {

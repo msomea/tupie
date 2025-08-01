@@ -8,7 +8,7 @@
     <h1>All Available Items</h1>
     <p>Browse through all items listed by the community</p>
 
-    <!-- ✅ Search & Filter Form -->
+    <!--  Search & Filter Form -->
     <form id="live-search-form" class="filter-form" onsubmit="return false;">
       <input 
         type="text" 
@@ -26,7 +26,7 @@
       <button type="button" id="search-btn">🔍 Search</button>
     </form>
 
-    <!-- ✅ AJAX results -->
+    <!--  AJAX results -->
     <div id="items-container">
       <div class="items-grid">
         {% for item in page_obj %}
@@ -39,7 +39,7 @@
   </div>
 </section>
 
-    <!-- ✅ PAGINATION CONTROLS -->
+    <!--  PAGINATION CONTROLS -->
       {% if page_obj.has_other_pages %}
       <div class="pagination">
         {% if page_obj.has_previous %}
@@ -67,7 +67,7 @@
   </div>
 </section>
 
-<!-- ✅ JS for live search -->
+<!--  JS for live search -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const queryInput = document.getElementById("search-query");

@@ -31,7 +31,9 @@
     {% endif %}
 
   <!-- Placeholder for future messaging -->
-  <button disabled class="bg-gray-400 text-white px-4 py-2 rounded">
+  <a href="{% url 'conversation' owner.user.id %}" class="bg-green-600 text-white px-3 py-1 rounded mt-4 inline-block">
+    Message {{ owner.user.username }}
+  </a>
     Message (coming soon)
   </button>
 </div>

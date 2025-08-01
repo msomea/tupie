@@ -1,5 +1,5 @@
 from django import forms
-from .models import Item, Region, District, Ward, Place, Street, UserProfile
+from .models import Item, Region, District, Ward, Place, Street, UserProfile, Message
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -133,3 +133,13 @@ class UserProfileUpdateForm(forms.ModelForm):
                 pass
         elif self.instance.pk and self.instance.ward:
             self.fields['place'].queryset = Place.objects.filter(ward=self.instance.ward).order_by('place_name')
+    
+
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your message...'}),
+        }

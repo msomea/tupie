@@ -51,6 +51,11 @@ html, body {
   align-items: center;
   gap: 10px;
 }
+.navbar img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}
 .navbar .logo img {
   height: 45px;
 }
@@ -75,7 +80,14 @@ html, body {
   background: rgba(255,255,255,0.15);
   border-radius: 5px;
 }
-/* ✅ Hamburger button hidden by default */
+.inbox-icon {
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+  color: white;
+}
+
+/*  Hamburger button hidden by default */
 .menu-toggle {
   display: none;
   background: none;
@@ -85,7 +97,7 @@ html, body {
   cursor: pointer;
 }
 
-/* ✅ Mobile View */
+/*  Mobile View */
 @media (max-width: 992px) {
   .nav-links {
     position: absolute;
@@ -253,6 +265,7 @@ html, body {
     overflow: hidden;
 }
 .item-image img {
+  border-radius: 5px;
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;  /*   show full image */
@@ -274,6 +287,7 @@ html, body {
 
     display: -webkit-box;
     -webkit-line-clamp: 1;   /*   max 2 lines */
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin-bottom: 10px;
@@ -296,7 +310,7 @@ html, body {
 .item-card .location small span {
     color: #aaa;  /*   lighter arrows */
 }
-/* ✅ Owner name on item card */
+/*  Owner name on item card */
 .owner {
   font-size: 0.9rem;        /* slightly smaller than title */
   font-weight: bold;
@@ -320,7 +334,7 @@ html, body {
 }
 
 
-/* ✅ Requests Table Section */
+/*  Requests Table Section */
 .requests-table {
   width: 100%;
   border-collapse: collapse;
@@ -368,7 +382,7 @@ html, body {
   text-decoration: underline;
 }
 
-/* ✅ Status Labels */
+/*  Status Labels */
 .requests-table td span {
   font-weight: bold;
 }
@@ -479,7 +493,7 @@ html, body {
     border-radius: 6px;
 }
 
-/* ✅ Profile page preview styling */
+/*  Profile page preview styling */
 .profile-preview {
   margin-bottom: 20px;
   text-align: center;
@@ -497,14 +511,14 @@ html, body {
   display: block;      /* center align */
 }
 
-/* ✅ For ID Document (can stay rectangular) */
+/*  For ID Document (can stay rectangular) */
 .id-preview {
   width: 200px;
   height: auto;
   border-radius: 10px;  /* slight rounded corners */
 }
 
-/* ✅ Form grid styling (same theme) */
+/*  Form grid styling (same theme) */
 .profile-form .form-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -519,7 +533,7 @@ html, body {
   display: block;
 }
 
-/* ✅ Submit button matches theme */
+/*  Submit button matches theme */
 .profile-form .submit-btn {
   background: #4A704A;
   color: white;
@@ -683,7 +697,7 @@ footer {
     margin-top: 20px;
 }
 
-/* ✅ Owner Profile Card */
+/*  Owner Profile Card */
 .owner-card {
   background: #FFF;
   padding: 20px;
@@ -691,7 +705,7 @@ footer {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   text-align: center;
   width: 320px;          /* default width for desktop */
-  max-width: 90%;        /* ✅ makes it shrink on small screens */
+  max-width: 90%;        /*  makes it shrink on small screens */
   margin: 40px auto;     /* center it horizontally */
   transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
@@ -702,21 +716,21 @@ footer {
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-/* ✅ Profile name styling */
+/*  Profile name styling */
 .owner-card h2 {
   color: #4A704A;
   font-size: 1.3rem;
   margin: 10px 0;
 }
 
-/* ✅ Contact details */
+/*  Contact details */
 .owner-card p {
   font-size: 0.95rem;
   color: #555;
   margin: 6px 0;
 }
 
-/* ✅ Profile image centered & rounded */
+/*  Profile image centered & rounded */
 .owner-card img.profile-avatar {
   width: 120px;
   height: 120px;
@@ -726,7 +740,7 @@ footer {
   margin-bottom: 15px;
 }
 
-/* ✅ Extra small screen fix */
+/*  Extra small screen fix */
 @media (max-width: 480px) {
   .owner-card {
     width: 95%;        /* take almost full width on very small screens */

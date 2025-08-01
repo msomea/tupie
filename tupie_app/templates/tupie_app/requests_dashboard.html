@@ -32,7 +32,7 @@
               {% if req.status == "pending" %}
                 <span style="color: orange;">⏳ Pending</span>
               {% elif req.status == "accepted" %}
-                <span style="color: green;">✅ Accepted</span>
+                <span style="color: green;"> Accepted</span>
               {% else %}
                 <span style="color: red;">❌ Declined</span>
               {% endif %}
@@ -40,7 +40,7 @@
             <td>{{ req.created_at|date:"M d, Y H:i" }}</td>
             <td>
               {% if req.status == "pending" %}
-                <a href="{% url 'update_request_status' req.id 'accept' %}" class="btn-accept">✅ Accept</a>
+                <a href="{% url 'update_request_status' req.id 'accept' %}" class="btn-accept"> Accept</a>
                 <a href="{% url 'update_request_status' req.id 'decline' %}" class="btn-decline">❌ Decline</a>
               {% else %}
                 <span style="color: #777;">No actions</span>

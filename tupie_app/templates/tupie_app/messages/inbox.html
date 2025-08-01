@@ -1,0 +1,18 @@
+{% extends 'tupie_app/base.html' %}
+{% load humanize %}
+{% load static %}
+{% block title %}Inbox{% endblock %}
+{% block content %}
+<h2 class="text-xl font-semibold mb-4">Inbox</h2>
+
+{% for msg in messages %}
+  <div class="p-4 border-b">
+    <p><strong>From:</strong> {{ msg.sender.username }}</p>
+    <p><strong>Message:</strong> {{ msg.content|truncatewords:20 }}</p>
+    <p><a href="{% url 'conversation' msg.sender.id %}" class="text-blue-600">View Conversation</a></p>
+    <p class="text-gray-500 text-sm">{{ msg.timestamp|naturaltime }}</p>
+  </div>
+{% empty %}
+  <p>No messages yet.</p>
+{% endfor %}
+{% endblock %}

@@ -41,6 +41,11 @@ urlpatterns = [
     # Search for items
     path("search-items/", views.search_items, name="search_items"),
 
+    # Message
+    path('messages/', views.inbox, name='inbox'),
+    path('message/send/<int:receiver_id>/', views.send_message, name='send_message'),
+    path('message/conversation/<int:user_id>/', views.conversation, name='conversation'),
+
 ]
 
 # Serve media files in development
