@@ -3,16 +3,34 @@
 {% load static %}
 {% block title %}Inbox{% endblock %}
 {% block content %}
-<h2 class="text-xl font-semibold mb-4">Inbox</h2>
 
-{% for msg in messages %}
-  <div class="form-section">
-    <p><strong>From:</strong> {{ msg.sender.username }}</p>
-    <p><strong>Message:</strong> {{ msg.content|truncatewords:20 }}</p>
-    <a href="{% url 'conversation' msg.sender.id %}" class="text-blue-600"><button class="cta-btn">View Conversation</button></a>
-    <p class="text-gray-500 text-sm">{{ msg.timestamp|naturaltime }}</p>
-  </div>
-{% empty %}
-  <p>No messages yet.</p>
-{% endfor %}
+<h2>Your Conversations</h2>
+
+{% if convo_data %}
+  <ul>
+    {% for item in convo_data %}
+      <li>
+        <a href="{% url 'conversation' item.conversation.id %}">
+          Conversation with 
+          {% for user in item.other_users %}
+            {{ user.username }}{% if not forloop.last %}, {% endif %}
+          {% empty %}
+            (No participants)
+          {% endfor %}
+        </a>
+        <br>
+        <small>Last message at: 
+          {% if item.conversation.messages.first %}
+            {{ item.conversation.messages.first.timestamp|naturaltime }}
+          {% else %}
+            No messages yet
+          {% endif %}
+        </small>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No conversations yet. Start messaging people!</p>
+{% endif %}
+
 {% endblock %}

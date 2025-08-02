@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, resolve_url, get_object_or_404
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Item, Region, District, Ward, Place, UserProfile, ItemRequest, Message
+from .models import Item, Region, District, Ward, Place, UserProfile, ItemRequest, Message, Conversation, User
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -290,40 +290,104 @@ def send_message(request, receiver_id):
     return render(request, 'tupie_app/messages/send_message.html', {'form': form, 'receiver': receiver})
 
 @login_required
-def inbox(request):
-    # Fetch all messages received by user
-    messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
-    # Mark all unread messages as read when user opens inbox
-    messages.filter(is_read=False).update(is_read=True)
-    unread_count = 0
-    if request.user.is_authenticated:
-        unread_count = request.user.received_messages.filter(is_read=False).count()
+def start_conversation(request, user_id):
+    other_user = get_object_or_404(User, id=user_id)
 
-    context = {
-        # your existing context variables...
-        'unread_count': unread_count,
-    }
-    return render(request, 'tupie_app/messages/inbox.html', {'messages': messages})
+    # Avoid chatting with self
+    if other_user == request.user:
+        return redirect('inbox')
+
+    # Check if conversation exists
+    conversation = Conversation.objects.filter(participants=request.user).filter(participants=other_user).first()
+    if not conversation:
+        conversation = Conversation.objects.create()
+        conversation.participants.set([request.user, other_user])
+
+    return redirect('conversation', conversation_id=conversation.id)
+
 
 @login_required
-def conversation(request, user_id):
-    other_user = get_object_or_404(User, id=user_id)
-    messages = Message.objects.filter(
-        sender__in=[request.user, other_user],
-        receiver__in=[request.user, other_user]
-    ).order_by('timestamp')
+def inbox(request):
+    conversations = Conversation.objects.filter(participants=request.user)
+
+    # Mark all unread messages as read except those sent by the user
+    for convo in conversations:
+        convo.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+
+    unread_count = Message.objects.filter(receiver=request.user, is_read=False).count()
+
+    # Prepare a list of conversations along with their other participants
+    convo_data = []
+    for convo in conversations:
+        other_users = convo.participants.exclude(id=request.user.id)
+        convo_data.append({
+            'conversation': convo,
+            'other_users': other_users,
+        })
+
+    context = {
+        'convo_data': convo_data,
+        'unread_count': unread_count,
+    }
+    return render(request, 'tupie_app/messages/inbox.html', context)
+
+
+
+@login_required
+def send_message(request, receiver_id):
+    receiver = get_object_or_404(User, id=receiver_id)
+
+    # Find or create a conversation
+    conversation = Conversation.objects.filter(participants=request.user).filter(participants=receiver).first()
+    if not conversation:
+        conversation = Conversation.objects.create()
+        conversation.participants.set([request.user, receiver])
+
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
             message.sender = request.user
-            message.receiver = other_user
+            message.receiver = receiver
+            message.conversation = conversation
             message.save()
-            return redirect('conversation', user_id=other_user.id)
+            return redirect('conversation', conversation_id=conversation.id)
     else:
         form = MessageForm()
+
+    return render(request, 'tupie_app/messages/send_message.html', {'form': form, 'receiver': receiver})
+
+@login_required
+def conversation(request, conversation_id):
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+
+    if request.user not in conversation.participants.all():
+        return redirect('inbox')
+
+    # Get the other participant
+    other_user = conversation.participants.exclude(id=request.user.id).first()
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.conversation = conversation
+            message.sender = request.user
+            message.receiver = other_user
+            message.save()
+            return redirect('conversation', conversation_id=conversation.id)
+    else:
+        form = MessageForm()
+
+    # Mark all messages from the other user as read
+    conversation.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+
+    unread_count = Message.objects.filter(receiver=request.user, is_read=False).count()
+
     return render(request, 'tupie_app/messages/conversation.html', {
-        'messages': messages,
+        'conversation': conversation,
         'form': form,
-        'other_user': other_user
+        'other_user': other_user,
+        'unread_count': unread_count,
     })
+

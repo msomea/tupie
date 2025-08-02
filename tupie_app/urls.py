@@ -43,8 +43,9 @@ urlpatterns = [
 
     # Message
     path('messages/', views.inbox, name='inbox'),
+    path('message/start/<int:user_id>/', views.start_conversation, name='start_conversation'),
     path('message/send/<int:receiver_id>/', views.send_message, name='send_message'),
-    path('message/conversation/<int:user_id>/', views.conversation, name='conversation'),
+    path('message/<int:conversation_id>/', views.conversation, name='conversation'),
 
 ]
 

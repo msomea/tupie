@@ -4,20 +4,25 @@
 {% block title %}Chat with {{ other_user.username }}{% endblock %}
 {% block content %}
 
-  <div class="form-section">
-    <h1>Chat with {{ other_user.username }}</h1>
-    {% for msg in messages %}
-      <div class="{% if msg.sender == request.user %}text-right{% else %}text-left{% endif %}">
-        <p class="inline-block bg-white p-2 rounded shadow-sm mb-1">
-          {{ msg.content }}
-        </p>
-        <p class="text-xs text-gray-500">{{ msg.timestamp|naturaltime }}</p>
-      </div>
-    {% endfor %}
-    <form method="POST" class="item-form">
+<h2 class="mb-4">Chat with {{ other_user.username }}</h2>
+
+<div class="form-section">
+  {% for msg in conversation.messages.all %}
+    <div class="{% if msg.sender == request.user %}text-right{% else %}text-left{% endif %}">
+      <p class="inline-block bg-white p-2 rounded shadow-sm mb-1">
+        <strong>{{ msg.sender.username }}:</strong> {{ msg.content }}
+      </p>
+      <p class="text-xs text-gray-500">{{ msg.timestamp|naturaltime }}</p>
+    </div>
+  {% empty %}
+    <p>No messages yet. Start the conversation!</p>
+  {% endfor %}
+
+  <form method="POST" class="item-form">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="cta-btn">Send Message</button>
-    </form>
-  </div>
+  </form>
+</div>
+
 {% endblock %}

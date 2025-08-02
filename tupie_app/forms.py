@@ -141,5 +141,10 @@ class MessageForm(forms.ModelForm):
         model = Message
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your message...'}),
+            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your message...', 'class': 'form-control'}),
         }
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        if not content.strip():
+            raise forms.ValidationError("Message cannot be empty.")
+        return content

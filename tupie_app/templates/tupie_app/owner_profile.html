@@ -42,9 +42,13 @@
   <!-- Messaging -->
 <div>
   {% if user.is_authenticated %}
-    <a href="{% url 'conversation' owner.user.id %}"><button class="cta-btn">Message {{ owner.user.username }}</button></a>
+    <a href="{% url 'start_conversation' owner.user.id %}">
+    <button class="cta-btn">Message {{ owner.user.username }}</button>
+    </a>
   {% else %}
-    <a href="{% url 'conversation' owner.user.id %}"><button class="cta-btn">Login to Message {{ owner.user.username }}</button></a>
+    <a href="{% url 'start_conversation' owner.user.id %}">
+    <button class="cta-btn">Message {{ owner.user.username }}</button>
+    </a>
   {% endif %}
 </div>
 {% endblock %}
