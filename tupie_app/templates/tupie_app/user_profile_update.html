@@ -1,11 +1,10 @@
 {% extends 'tupie_app/base.html' %}
 {% load static %}
-
 {% block title %}Update Profile{% endblock %}
 
 {% block content %}
 <section class="form-section">
-  <h1>Update Your Profile</h1>
+  <h2>Update Your Profile</h2>
 
   <!--  Display current profile picture -->
     <div class="profile-preview">
@@ -52,9 +51,9 @@
 
   <!--  Show current verification badge -->
   <h3>Verification Status</h3>
-  {% if request.user.userprofile.verification_status == "verified" %}
+  {% if request.user.userprofile.verification_status == "verified" or "administrator" or "organization" %}
     <p>Verified as: 
-    {% include "tupie_app/_verification_badge.html" with user_profile=request.user.userprofile %}
+    {% include "tupie_app/partials/_verification_badge.html" with user_profile=request.user.userprofile %}
     </p>
   {% elif request.user.userprofile.verification_status == "pending" %}
     <p style="color: orange;">⏳ Your ID is under review</p>

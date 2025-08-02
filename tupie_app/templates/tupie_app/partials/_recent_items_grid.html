@@ -1,6 +1,6 @@
     <div class="items-grid">
         {% for item in items %}
-            {% include "tupie_app/_item_card.html" with item=item %}
+            {% include "tupie_app/partials/_item_card.html" with item=item %}
         {% empty %}
             <p class="coming-soon">No items available at the moment...</p>
         {% endfor %}

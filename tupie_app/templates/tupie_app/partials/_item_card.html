@@ -23,7 +23,7 @@
         <strong>👤:</strong>
         <a href="{% url 'owner_profile' item.owner.id %}"class="owner">
         {{ item.owner.username }}</a>
-        {% include 'tupie_app/_verification_badge.html' with user_profile=item.owner.userprofile %}
+        {% include 'tupie_app/partials/_verification_badge.html' with user_profile=item.owner.userprofile %}
         
     </p>
     <!--   Availability status -->

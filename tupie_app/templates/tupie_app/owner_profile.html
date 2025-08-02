@@ -11,14 +11,23 @@
   
   <h2>
     {{ owner.user.username }}
-    {% include 'tupie_app/_verification_badge.html' with user_profile=owner %}
+    {% include 'tupie_app/partials/_verification_badge.html' with user_profile=owner %}
   </h2>
 
-  <p><strong>Phone:</strong> {{ owner.phone_number }}</p>
-  <p><strong>Email:</strong> {{ owner.user.email }}</p>
+  {% if owner.phone_number %}
+    <p><strong>Phone:</strong> {{ owner.phone_number }}</p>
+    {% else %}
+    <p><strong>Phone:</strong> Not provided yet</p>
+  {% endif %}
 
-    {% if owner.place or owner.ward or owner.district or owner.region %}
-    <p><strong>Location:</strong> 
+  {% if owner.user.email %}
+  <p><strong>Email:</strong> {{ owner.user.email }}</p>
+  {% else %}
+  <p><strong>Email:</strong> Not provided yet</p>
+  {% endif %}
+
+  {% if owner.place or owner.ward or owner.district or owner.region %}
+    <p><strong>🏠︎:</strong> 
         <small>
         {{ owner.place|default_if_none:"" }},
         {{ owner.ward|default_if_none:"" }},
@@ -30,11 +39,12 @@
     <p><strong>Location:</strong> Not provided yet</p>
     {% endif %}
 
-  <!-- Placeholder for future messaging -->
-  <a href="{% url 'conversation' owner.user.id %}" class="bg-green-600 text-white px-3 py-1 rounded mt-4 inline-block">
-    Message {{ owner.user.username }}
-  </a>
-    Message (coming soon)
-  </button>
+  <!-- Messaging -->
+<div>
+  {% if user.is_authenticated %}
+    <a href="{% url 'conversation' owner.user.id %}"><button class="cta-btn">Message {{ owner.user.username }}</button></a>
+  {% else %}
+    <a href="{% url 'conversation' owner.user.id %}"><button class="cta-btn">Login to Message {{ owner.user.username }}</button></a>
+  {% endif %}
 </div>
 {% endblock %}

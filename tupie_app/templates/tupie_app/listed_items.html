@@ -5,7 +5,7 @@
 {% block content %}
 <section class="all-items">
   <div class="container">
-    <h1>All Available Items</h1>
+    <h2>All Available Items</h2>
     <p>Browse through all items listed by the community</p>
 
     <!--  Search & Filter Form -->
@@ -30,7 +30,7 @@
     <div id="items-container">
       <div class="items-grid">
         {% for item in page_obj %}
-          {% include "tupie_app/_item_card.html" %}
+          {% include "tupie_app/partials/_item_card.html" %}
         {% empty %}
           <p>No items found.</p>
         {% endfor %}

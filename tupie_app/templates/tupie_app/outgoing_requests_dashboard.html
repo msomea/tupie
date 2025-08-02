@@ -5,7 +5,7 @@
 {% block content %}
 <section class="all-items">
   <div class="container">
-    <h1>My Outgoing Requests</h1>
+    <h2>My Outgoing Requests</h2>
     <p>Here are the items you requested from other users.</p>
 
     {% if my_outgoing_requests %}
@@ -28,7 +28,7 @@
             </td>
             <td>
              {{ req.owner.username }}
-              {% include "tupie_app/_verification_badge.html" with user_profile=req.owner.userprofile %}
+              {% include "tupie_app/partials/_verification_badge.html" with user_profile=req.owner.userprofile %}
             </td>
             <td>
               {% if req.status == "pending" %}

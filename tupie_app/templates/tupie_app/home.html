@@ -8,7 +8,11 @@
 <header class="hero">
     <h1>WELCOME TO TUPIE</h1>
     <p>If you're about to throw something away, we have a way for it to find a new home</p>
-    <a href="{% url 'list_item' %}"><button class="cta-btn">List an Item</button></a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'list_item' %}"><button class="cta-btn">Add an Item</button></a>
+    {% else %}
+    <a href="{% url 'list_item' %}"><button class="cta-btn">Login to add an Item</button></a>
+    {% endif %}
 </header>
 
 <!--   How it works -->
@@ -26,7 +30,7 @@
 <section class="item-listings">
     <h2>Recently Added Items</h2>
     
-    {% include "tupie_app/_recent_items_grid.html" %}
+    {% include "tupie_app/partials/_recent_items_grid.html" %}
 
 </section>
 <script>

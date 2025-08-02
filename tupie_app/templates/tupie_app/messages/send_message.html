@@ -3,11 +3,11 @@
 {% load static %}
 {% block title %}Send Message to {{ receiver.username }}{% endblock %}
 {% block content %}
-<h2 class="text-xl mb-2">Send Message to {{ receiver.username }}</h2>
+<h1 class="text-xl mb-2">Send Message to {{ receiver.username }}</h1>
 
-<form method="POST">
+<form method="POST" class="item-form">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Send</button>
+  <button type="submit" class="submit-btn">Send</button>
 </form>
 {% endblock %}
