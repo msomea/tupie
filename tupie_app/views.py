@@ -13,6 +13,8 @@ from django.db.models import Prefetch
 from django.template.loader import render_to_string
 from django.db.models import Q
 from django.db import IntegrityError
+from django.views.decorators.http import require_POST
+
 
 
 
@@ -309,27 +311,24 @@ def start_conversation(request, user_id):
 @login_required
 def inbox(request):
     conversations = Conversation.objects.filter(participants=request.user)
-
-    # Mark all unread messages as read except those sent by the user
-    for convo in conversations:
-        convo.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
-
-    unread_count = Message.objects.filter(receiver=request.user, is_read=False).count()
-
-    # Prepare a list of conversations along with their other participants
+    
     convo_data = []
     for convo in conversations:
         other_users = convo.participants.exclude(id=request.user.id)
+        unread_count = convo.messages.filter(is_read=False, receiver=request.user).count()
         convo_data.append({
             'conversation': convo,
             'other_users': other_users,
+            'unread_count': unread_count,
         })
 
-    context = {
+    unread_total = Message.objects.filter(receiver=request.user, is_read=False).count()
+
+    return render(request, 'tupie_app/messages/inbox.html', {
         'convo_data': convo_data,
-        'unread_count': unread_count,
-    }
-    return render(request, 'tupie_app/messages/inbox.html', context)
+        'unread_count': unread_total,
+    })
+
 
 
 
@@ -391,3 +390,39 @@ def conversation(request, conversation_id):
         'unread_count': unread_count,
     })
 
+# Fetchin messages in realtime
+@login_required
+def ajax_fetch_messages(request, conversation_id):
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+
+    if request.user not in conversation.participants.all():
+        return HttpResponse(status=403)
+
+    # Mark all incoming unread messages as read (delivered)
+    conversation.messages.filter(is_read=False, receiver=request.user).update(is_read=True)
+
+    messages_html = render_to_string('tupie_app/messages/_messages_partial.html', {
+        'conversation': conversation,
+        'request': request,
+    })
+
+    return HttpResponse(messages_html)
+
+
+
+@login_required
+@require_POST
+def ajax_send_message(request, conversation_id):
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+    if request.user not in conversation.participants.all():
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    content = request.POST.get('content')
+    if content:
+        Message.objects.create(
+            conversation=conversation,
+            sender=request.user,
+            receiver=conversation.participants.exclude(id=request.user.id).first(),
+            content=content
+        )
+    return JsonResponse({'success': True})

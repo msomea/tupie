@@ -760,3 +760,11 @@ footer {
   }
 }
 
+
+/* Inbox */
+.inbox-list {
+  list-style: none;
+}
+.inbox-list p {
+  color: #4A704A;
+}

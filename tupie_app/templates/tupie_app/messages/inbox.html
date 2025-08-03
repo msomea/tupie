@@ -1,36 +1,35 @@
 {% extends 'tupie_app/base.html' %}
-{% load humanize %}
+
 {% load static %}
 {% block title %}Inbox{% endblock %}
+
 {% block content %}
+<div>
+  <h2>Inbox</h2>
 
-<h2>Your Conversations</h2>
-
-{% if convo_data %}
-  <ul>
-    {% for item in convo_data %}
-      <li>
-        <a href="{% url 'conversation' item.conversation.id %}">
-          Conversation with 
-          {% for user in item.other_users %}
-            {{ user.username }}{% if not forloop.last %}, {% endif %}
-          {% empty %}
-            (No participants)
-          {% endfor %}
-        </a>
-        <br>
-        <small>Last message at: 
-          {% if item.conversation.messages.first %}
-            {{ item.conversation.messages.first.timestamp|naturaltime }}
-          {% else %}
-            No messages yet
-          {% endif %}
-        </small>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No conversations yet. Start messaging people!</p>
-{% endif %}
+  {% if convo_data %}
+    <ul class="form-section">
+      {% for item in convo_data %}
+        <li class="inbox-list">
+          <div>
+            {% for other_user in item.other_users %}
+              <p><strong>{{ other_user.username }}</strong></p>
+              <p><small>{{ other_user.email }}</small></p>
+            {% endfor %}
+          </div>
+          <div>
+            {% if item.unread_count %}
+              <span class="bg-gold text-black text-sm px-2 py-1 rounded-full">{{ item.unread_count }} new</span><br>
+            {% endif %}
+            <a href="{% url 'conversation' item.conversation.id %}" ><button class="cta-btn">View</button></a>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No conversations yet.</p>
+  {% endif %}
+</div>
 
 {% endblock %}
+

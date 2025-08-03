@@ -1,28 +1,64 @@
 {% extends 'tupie_app/base.html' %}
-{% load humanize %}
+
 {% load static %}
 {% block title %}Chat with {{ other_user.username }}{% endblock %}
 {% block content %}
 
 <h2 class="mb-4">Chat with {{ other_user.username }}</h2>
 
-<div class="form-section">
-  {% for msg in conversation.messages.all %}
-    <div class="{% if msg.sender == request.user %}text-right{% else %}text-left{% endif %}">
-      <p class="inline-block bg-white p-2 rounded shadow-sm mb-1">
-        <strong>{{ msg.sender.username }}:</strong> {{ msg.content }}
-      </p>
-      <p class="text-xs text-gray-500">{{ msg.timestamp|naturaltime }}</p>
-    </div>
-  {% empty %}
-    <p>No messages yet. Start the conversation!</p>
-  {% endfor %}
+<div id="chat-box" class="form-section">
+  <div id="message-list">
+    {% for msg in conversation.messages.all %}
+      <div class="{% if msg.sender == request.user %}text-right{% else %}text-left{% endif %}">
+        <p class="inline-block bg-white p-2 rounded shadow-sm mb-1">
+          <strong>{{ msg.sender.username }}:</strong> {{ msg.content }} 
+          {% if msg.sender == request.user %}
+            <small class="text-xs text-gray-500">
+              {% if msg.is_read %}✔✔ Read{% else %}✔ Sent{% endif %}
+            </small>
+          {% endif %}
+        </p>
+        <small class="text-xs text-gray-500">{{ msg.timestamp|date:"M d, Y H:i" }}</small>
+      </div>
+    {% empty %}
+      <p>No messages yet. Start the conversation!</p>
+    {% endfor %}
+  </div>
 
-  <form method="POST" class="item-form">
+  <form id="chat-form" method="POST" class="item-form" style="margin-top: 20px;">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="cta-btn">Send Message</button>
   </form>
 </div>
+
+<!-- Script for AJAX fetching realtime sms -->
+<script>
+  const conversationId = "{{ conversation.id }}";
+
+  function fetchMessages() {
+    $.get(`/messages/ajax/${conversationId}/`, function(data) {
+      $('#message-list').html(data);
+    });
+  }
+
+  setInterval(fetchMessages, 3000);  // Poll every 3 seconds
+
+  $('#chat-form').on('submit', function(e) {
+    e.preventDefault();
+    $.ajax({
+      url: `/messages/send/${conversationId}/`,
+      method: 'POST',
+      data: $(this).serialize(),
+      success: function() {
+        fetchMessages();  // Refresh messages
+        $('#chat-form')[0].reset();  // Clear form
+      },
+      error: function() {
+        alert('Failed to send message.');
+      }
+    });
+  });
+</script>
 
 {% endblock %}

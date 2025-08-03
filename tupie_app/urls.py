@@ -46,6 +46,9 @@ urlpatterns = [
     path('message/start/<int:user_id>/', views.start_conversation, name='start_conversation'),
     path('message/send/<int:receiver_id>/', views.send_message, name='send_message'),
     path('message/<int:conversation_id>/', views.conversation, name='conversation'),
+    path('messages/ajax/<int:conversation_id>/', views.ajax_fetch_messages, name='ajax_fetch_messages'),
+    path('messages/send/<int:conversation_id>/', views.ajax_send_message, name='ajax_send_message'),
+
 
 ]
 

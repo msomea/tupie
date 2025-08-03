@@ -1,0 +1,15 @@
+{% for msg in conversation.messages.all %}
+  <div class="{% if msg.sender == request.user %}text-right{% else %}text-left{% endif %}">
+    <p class="inline-block bg-white p-2 rounded shadow-sm mb-1">
+      <strong>{{ msg.sender.username }}:</strong> {{ msg.content }} 
+      {% if msg.sender == request.user %}
+        <small class="text-xs text-gray-500">
+          {% if msg.is_read %}✔✔ Read{% else %}✔ Sent{% endif %}
+        </small>
+      {% endif %}
+    </p>
+    <small class="text-xs text-gray-500">{{ msg.timestamp|date:"M d, Y H:i" }}</small>
+  </div>
+{% empty %}
+  <p>No messages yet. Start the conversation!</p>
+{% endfor %}
