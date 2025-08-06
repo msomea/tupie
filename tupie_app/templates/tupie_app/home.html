@@ -9,9 +9,9 @@
     <h1>WELCOME TO TUPIE</h1>
     <p>If you're about to throw something away, we have a way for it to find a new home</p>
     {% if user.is_authenticated %}
-    <a href="{% url 'list_item' %}"><button class="cta-btn">Add an Item</button></a>
+    <a href="{% url 'tupie_app:list_item' %}"><button class="cta-btn">Add an Item</button></a>
     {% else %}
-    <a href="{% url 'list_item' %}"><button class="cta-btn">Login to add an Item</button></a>
+    <a href="{% url 'tupie_app:list_item' %}"><button class="cta-btn">Login to add an Item</button></a>
     {% endif %}
 </header>
 
@@ -36,7 +36,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     setInterval(() => {
-        fetch("{% url 'home' %}?ajax=1")
+        fetch("{% url 'tupie_app:home' %}?ajax=1")
             .then(response => response.text())
             .then(html => {
                 // Replace the items grid only

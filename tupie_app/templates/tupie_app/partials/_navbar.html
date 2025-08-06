@@ -1,0 +1,46 @@
+{% load static %}
+
+<nav class="navbar" role="navigation" aria-label="Main Navigation">
+  <!-- Logo -->
+  <div class="logo">
+    <a href="{% url 'tupie_app:home' %}">
+      <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Tupie Logo">
+      <span class="logo-text">Tupie</span>
+    </a>
+  </div>
+
+  <!-- Navigation Links -->
+  <div class="nav-links" id="navMenu">
+    <a href="{% url 'tupie_app:home' %}">Home</a>
+    <a href="{% url 'tupie_app:listed_items' %}">Browse</a>
+    <a href="{% url 'tupie_app:about' %}">About</a>
+    <a href="{% url 'tupie_app:donation' %}">Donation</a>
+
+    {% if user.is_authenticated %}
+      <a href="{% url 'tupie_app:list_item' %}">Add Item</a>
+      <a href="{% url 'tupie_app:requests_dashboard' %}">Requests</a>
+      <a href="{% url 'tupie_app:outgoing_requests_dashboard' %}">My Requests</a>
+
+      <a href="{% url 'tupie_app:inbox' %}" class="relative inline-block">
+        <img src="{% static 'tupie_app/media/icons/email.ico' %}" alt="Inbox" class="inbox-icon">
+        {% if unread_count > 0 %}
+          <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+            {{ unread_count }}
+          </span>
+        {% endif %}
+      </a>
+
+      <a href="{% url 'tupie_app:update_profile' %}">
+        {{ user.username }}
+        {% include "tupie_app/partials/_verification_badge.html" with user_profile=user.userprofile %}
+      </a>
+      <a href="{% url 'tupie_app:logout' %}">Logout</a>
+    {% else %}
+      <a href="{% url 'tupie_app:signup' %}">Signup</a>
+      <a href="{% url 'tupie_app:login' %}">Login</a>
+    {% endif %}
+  </div>
+
+  <!-- Hamburger Menu -->
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+</nav>

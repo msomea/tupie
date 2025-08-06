@@ -7,7 +7,7 @@
 <section class="form-section">
     {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-danger">{{ message }}</div>
+        <div class="error-message">{{ message }}</div>
     {% endfor %}
     {% endif %}
     <h2>Create an Account</h2>
@@ -21,12 +21,18 @@
             {{ form.username }}
             {{ form.username.errors }}
         </p>
+        <!-- Email -->
+        <p>
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {{ form.email.errors }}
+        </p>
 
         <!-- Phone number -->
         <p>
-            <label for="id_phone_number">Phone Number</label>
-            <input type="text" name="phone_number" id="id_phone_number" 
-            placeholder="Enter your phone number" required>
+            {{ form.phone_number.label_tag }}
+            {{ form.phone_number }}
+            {{ form.phone_number.errors }}
         </p>
 
         <!-- Password -->
@@ -48,7 +54,7 @@
 
     <p class="alt-link">
         Already have an account?<br><br>
-        <a href="{% url 'login' %}"><button class="cta-btn">Login</button></a>
+        <a href="{% url 'tupie_app:login' %}"><button class="cta-btn">Login</button></a>
     </p>
 </section>
 {% endblock %}

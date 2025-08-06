@@ -1,16 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils import timezone
-
-# User verification status
-VERIFICATION_CHOICES = [
-    ('unverified', 'Unverified'),
-    ('verified', 'Verified User'),
-    ('organization', 'Verified Organization'),
-    ('administrator', 'Administrator'),
-]
 
 # Country
 class Country(models.Model):
@@ -29,7 +19,7 @@ class Country(models.Model):
     def __str__(self):
         return self.name
 
-# Region level to Place level
+# Region model
 class Region(models.Model):
     region_code = models.IntegerField(primary_key=True)
     region_name = models.TextField()
@@ -42,7 +32,7 @@ class Region(models.Model):
     def __str__(self):
         return self.region_name
 
-
+# Districts are subdivisions of regions
 class District(models.Model):
     district_code = models.IntegerField(primary_key=True)
     district_name = models.TextField()
@@ -55,7 +45,7 @@ class District(models.Model):
     def __str__(self):
         return self.district_name
 
-
+# Wards are subdivisions of districts
 class Ward(models.Model):
     ward_code = models.IntegerField(primary_key=True)
     ward_name = models.TextField()
@@ -69,7 +59,7 @@ class Ward(models.Model):
     def __str__(self):
         return self.ward_name
 
-
+# Place model
 class Place(models.Model):
     id = models.AutoField(primary_key=True)
     place_name = models.TextField()
@@ -90,9 +80,45 @@ class Street(models.Model):
 
     def __str__(self):
         return self.name or "No Street"
+    
+# Display a clean location string in templates
+@property
+def location_display(self):
+    parts = [str(self.region), str(self.district), str(self.ward), str(self.place), self.street]
+    return ", ".join(filter(None, parts))
 
+# User verification status
+VERIFICATION_CHOICES = [
+    ('unverified', 'Unverified'),
+    ('verified', 'Verified User'),
+    ('organization', 'Verified Organization'),
+    ('administrator', 'Administrator'),
+]
 
+#User Profile Model
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=100, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+    photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
 
+    region = models.ForeignKey('Region', on_delete=models.SET_NULL, blank=True, null=True)
+    district = models.ForeignKey('District', on_delete=models.SET_NULL, blank=True, null=True)
+    ward = models.ForeignKey('Ward', on_delete=models.SET_NULL, blank=True, null=True)
+    place = models.ForeignKey('Place', on_delete=models.SET_NULL, blank=True, null=True)
+    
+    id_document = models.ImageField(upload_to='verification_ids/', blank=True, null=True)
+    verification_status = models.CharField(
+        max_length=20,
+        choices=VERIFICATION_CHOICES,
+        default='unverified'
+    )
+
+    def __str__(self):
+        return f"{self.user.username} - {self.verification_status} - {self.region}  - {self.district} - {self.ward} - {self.place}" if self.user else "Unlinked Profile"
+
+# Item model
 class Item(models.Model):
     CATEGORY_CHOICES = [
         ("beverages", "Beverages"),
@@ -127,30 +153,6 @@ class Item(models.Model):
     def __str__(self):
         return self.title
     
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="userprofile")
-    
-    full_name = models.CharField(max_length=255, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
-    
-    region = models.ForeignKey('Region', on_delete=models.SET_NULL, blank=True, null=True)
-    district = models.ForeignKey('District', on_delete=models.SET_NULL, blank=True, null=True)
-    ward = models.ForeignKey('Ward', on_delete=models.SET_NULL, blank=True, null=True)
-    place = models.ForeignKey('Place', on_delete=models.SET_NULL, blank=True, null=True)
-    
-    id_document = models.ImageField(upload_to='verification_ids/', blank=True, null=True)
-    verification_status = models.CharField(
-        max_length=20,
-        choices=VERIFICATION_CHOICES,
-        default='unverified'
-    )
-
-    def __str__(self):
-        return f"{self.user.username}'s profile"
-
-    
 # Item request model
 class ItemRequest(models.Model):
     STATUS_CHOICES = [
@@ -168,6 +170,17 @@ class ItemRequest(models.Model):
 
     def __str__(self):
         return f"{self.requester.username} → {self.item.title} ({self.status})"
+    
+    def save(self, *args, **kwargs):
+        if not self.owner:
+            self.owner = self.item.owner
+        super().save(*args, **kwargs)
+    #Prevent duplicate requests for the same item by the same user
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['item', 'requester'], name='unique_item_request')
+        ]
+
 
 # Message model
 class Conversation(models.Model):

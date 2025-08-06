@@ -27,9 +27,12 @@
     <p><strong>Category:</strong> {{ item.get_category_display }}</p>
 
     <p><strong>Listed by:</strong>
-        <a href="{% url 'owner_profile' item.owner.id %}"class="owner">
+        <a href="{% url 'tupie_app:owner_profile' item.owner.id %}"class="owner">
         {{ item.owner.username }}</a>
         {% include "tupie_app/partials/_verification_badge.html" with user_profile=item.owner.userprofile %}
+    </p>
+    <p><strong>Email:</strong>
+        {{ item.owner.email }}
     </p>
 
     <p>
@@ -58,14 +61,14 @@
             {% elif item.owner == user %}
                 <button disabled style="background:#ccc;" class="cta-btn">Your Item</button>
             {% else %}
-                <a href="{% url 'request_item' item.id %}"><button class="cta-btn">Request</button></a>
+                <a href="{% url 'tupie_app:request_item' item.id %}"><button class="cta-btn">Request</button></a>
             {% endif %}
         {% else %}
-            <a href="{% url 'login' %}"><button class="cta-btn">Login to Request</button></a>
+            <a href="{% url 'tupie_app:login' %}"><button class="cta-btn">Login to Request</button></a>
         {% endif %}
 
         
-        <a href="{% url 'listed_items' %}"><button class="cta-btn">View More Items</button></a>
+        <a href="{% url 'tupie_app:listed_items' %}"><button class="cta-btn">View More Items</button></a>
     </div>
 </section>
 {% endblock %}

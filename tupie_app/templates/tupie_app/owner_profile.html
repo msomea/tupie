@@ -29,9 +29,9 @@
   {% if owner.place or owner.ward or owner.district or owner.region %}
     <p><strong>🏠︎:</strong> 
         <small>
-        {{ owner.place|default_if_none:"" }},
-        {{ owner.ward|default_if_none:"" }},
-        {{ owner.district|default_if_none:"" }},
+        {{ owner.place|default_if_none:"" }} く
+        {{ owner.ward|default_if_none:"" }} く
+        {{ owner.district|default_if_none:"" }} く
         {{ owner.region|default_if_none:"" }}
         </small>
     </p>

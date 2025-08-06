@@ -497,6 +497,13 @@ h2, h3 {
     border: 1px solid #ccc;
     border-radius: 6px;
 }
+.error-message {
+  color: red;
+  padding: 10px;
+  background-color: #ffd6d6;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
 
 /*  Profile page preview styling */
 .profile-preview {

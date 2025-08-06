@@ -2,21 +2,21 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
-from .views import user_profile_update
+
+app_name = 'tupie_app'
 
 urlpatterns = [
+    # Accounts
+    path('signup/', views.signup_view, name='signup'),
+    path('profile/', views.update_profile, name='update_profile'),
+    path('verify-email/<uidb64>/<token>/', views.verify_email, name='verify_email'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    
     # Home & static pages
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
     path('donation/', views.donation, name='donation'),
-
-    # Authentication
-    path('signup/', views.signup, name='signup'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
-
-    # Profile update
-    path('profile/update/', user_profile_update, name='user_profile_update'),
 
     # Profile view
     path("owner/<int:user_id>/", views.owner_profile, name="owner_profile"),
@@ -41,13 +41,12 @@ urlpatterns = [
     # Search for items
     path("search-items/", views.search_items, name="search_items"),
 
-    # Message
+    # Message URLs
     path('messages/', views.inbox, name='inbox'),
-    path('message/start/<int:user_id>/', views.start_conversation, name='start_conversation'),
-    path('message/send/<int:receiver_id>/', views.send_message, name='send_message'),
-    path('message/<int:conversation_id>/', views.conversation, name='conversation'),
-    path('messages/ajax/<int:conversation_id>/', views.ajax_fetch_messages, name='ajax_fetch_messages'),
-    path('messages/send/<int:conversation_id>/', views.ajax_send_message, name='ajax_send_message'),
+    path('messages/start/<int:user_id>/', views.start_conversation, name='start_conversation'),
+    path('messages/<int:conversation_id>/', views.conversation, name='conversation'),
+    path('messages/ajax-send-fetch/<int:conversation_id>/', views.ajax_send_fetch_message, name='ajax_send_fetch_message'),
+
 
 
 ]

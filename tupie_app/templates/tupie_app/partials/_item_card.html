@@ -21,7 +21,7 @@
     <!--   Owner + Verification Badge -->
     <p>
         <strong>👤:</strong>
-        <a href="{% url 'owner_profile' item.owner.id %}"class="owner">
+        <a href="{% url 'tupie_app:owner_profile' item.owner.id %}"class="owner">
         {{ item.owner.username }}</a>
         {% include 'tupie_app/partials/_verification_badge.html' with user_profile=item.owner.userprofile %}
         
@@ -64,5 +64,5 @@
 
     <!--   Details Button -->
 
-    <a href="{% url 'item_detail' item.pk %}" class="cta-btn">View Details</a>
+    <a href="{% url 'tupie_app:item_detail' item.pk %}" class="cta-btn">View Details</a>
 </div>

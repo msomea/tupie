@@ -35,24 +35,30 @@
 <!-- Script for AJAX fetching realtime sms -->
 <script>
   const conversationId = "{{ conversation.id }}";
+  const endpoint = `/messages/ajax-send-fetch/${conversationId}/`;
 
   function fetchMessages() {
-    $.get(`/messages/ajax/${conversationId}/`, function(data) {
-      $('#message-list').html(data);
+    $.get(endpoint, function(data) {
+      $('#message-list').html(data.html);
+      $('#message-list').scrollTop($('#message-list')[0].scrollHeight);
     });
   }
 
-  setInterval(fetchMessages, 3000);  // Poll every 3 seconds
+  if (!window.messagePolling) {
+    window.messagePolling = setInterval(fetchMessages, 3000);
+  }
 
   $('#chat-form').on('submit', function(e) {
     e.preventDefault();
+
     $.ajax({
-      url: `/messages/send/${conversationId}/`,
+      url: endpoint,
       method: 'POST',
       data: $(this).serialize(),
-      success: function() {
-        fetchMessages();  // Refresh messages
-        $('#chat-form')[0].reset();  // Clear form
+      success: function(data) {
+        $('#message-list').html(data.html);
+        $('#chat-form')[0].reset();
+        $('#message-list').scrollTop($('#message-list')[0].scrollHeight);
       },
       error: function() {
         alert('Failed to send message.');

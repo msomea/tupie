@@ -1,3 +1,4 @@
+# tupie_app/apps.py
 from django.apps import AppConfig
 
 class TupieAppConfig(AppConfig):

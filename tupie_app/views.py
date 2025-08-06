@@ -1,24 +1,149 @@
 from django.shortcuts import render, redirect, resolve_url, get_object_or_404
-from django.contrib.auth import login as auth_login, logout as auth_logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login as auth_login, logout as auth_logout, get_user_model
 from django.contrib.auth.models import User
-from .models import Item, Region, District, Ward, Place, UserProfile, ItemRequest, Message, Conversation, User
+from .models import Item, Region, District, Ward, Street, Place,ItemRequest, Message, Conversation, User, UserProfile
+from .forms import SignUpForm, UserProfileUpdateForm, ItemForm, MessageForm
+from django.utils import timezone
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
-from .forms import ItemForm, SignUpForm, UserProfileUpdateForm, MessageForm
-from django.db.models import Prefetch
+from .forms import ItemForm, MessageForm
 from django.template.loader import render_to_string
 from django.db.models import Q
 from django.db import IntegrityError
 from django.views.decorators.http import require_POST
+from django.urls import reverse
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+
+#Account managements
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            next_url = request.GET.get('next') or resolve_url('tupie_app:home')
+            return redirect(next_url)
+    else:
+        form = AuthenticationForm()
+    return render(request, 'tupie_app/accounts/login.html', {'form': form})
 
 
+def logout_view(request):
+    auth_logout(request)
+    return redirect('tupe_app:home')
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        phone_number = request.POST.get('phone_number', '').strip()
+        email = request.POST.get('email', '').strip().lower()
+
+        # Validate phone number
+        if not phone_number:
+            messages.error(request, 'Phone number is required.')
+            return render(request, 'tupie_app/accounts/signup.html', {'form': form})
+
+        if UserProfile.objects.filter(phone_number=phone_number).exists():
+            messages.error(request, 'Phone number is already registered.')
+            return render(request, 'tupie_app/accounts/signup.html', {'form': form})
+
+        # Validate email
+        if not email:
+            messages.error(request, 'Email is required.')
+            return render(request, 'tupie_app/accounts/signup.html', {'form': form})
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email is already in use. Please use a different email.')
+            return render(request, 'tupie_app/accounts/signup.html', {'form': form})
+
+        # Validate form
+        if form.is_valid():
+            try:
+                user = form.save(commit=False)
+                user.email = email
+                user.is_active = False  # Deactivate until email verification
+                user.save()
+
+                # Ensure profile exists
+                profile, created = UserProfile.objects.get_or_create(user=user)
+                profile.phone_number = phone_number
+                profile.save()
+
+                # Prepare email verification
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                verify_url = request.build_absolute_uri(
+                    reverse('tupie_app:verify_email', kwargs={'uidb64': uid, 'token': token})
+                )
+
+                subject = 'Verify your email address'
+                message = render_to_string('tupie_app/accounts/email_verification.html', {
+                    'user': user,
+                    'verify_url': verify_url
+                })
+
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+
+                messages.success(request, 'Account created. Please check your email to verify your account.')
+                return redirect('tupie_app:login')
+
+            except IntegrityError:
+                messages.error(request, 'Something went wrong. Please try again.')
+
+        else:
+            messages.error(request, 'Please correct the errors in the form.')
+
+    else:
+        form = SignUpForm()
+
+    return render(request, 'tupie_app/accounts/signup.html', {'form': form})
+
+def verify_email(request, uidb64, token):
+    UserModel = get_user_model()
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = UserModel.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Email verified! You can now log in.')
+        return redirect('tupie_app:login')
+    else:
+        messages.error(request, 'Verification link is invalid or expired.')
+        return redirect('tupie_app:login')
 
 
-# Create your views here.
+@login_required
+def update_profile(request):
+    profile = request.user.userprofile
+    if request.method == "POST":
+        form = UserProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+
+            if 'id_document' in request.FILES:
+                profile.verification_status = 'pending'
+                messages.info(request, "Your verification is now pending review.")
+
+            profile.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect('tupie_app:update_profile')
+    else:
+        form = UserProfileUpdateForm(instance=profile)
+
+    return render(request, 'tupie_app/accounts/profile_update.html', {'form': form})
+
+# Other views
 def home(request):
     items = Item.objects.filter(available=True).order_by('-created_at')[:6]
     return render(request, 'tupie_app/home.html', {'items': items})
@@ -28,66 +153,6 @@ def about(request):
 
 def donation(request):
     return render(request, 'tupie_app/donation.html')
-
-
-def signup(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        phone = request.POST.get('phone_number')
-        password = request.POST.get('password1')
-
-        form = UserCreationForm(request.POST)
-
-        #  Validate phone number is provided
-        if not phone:
-            messages.error(request, 'Phone number is required.')
-            return render(request, 'tupie_app/register.html', {'form': form})
-
-        #  Check if phone already exists before saving user
-        if UserProfile.objects.filter(phone_number=phone).exists():
-            messages.error(request, 'This phone number is already registered. Please use another one.')
-            return render(request, 'tupie_app/register.html', {'form': form})
-
-        if form.is_valid():
-            try:
-                #  Create user normally
-                user = form.save()  # Auto-creates UserProfile via signal
-                user.userprofile.phone_number = phone
-                user.userprofile.save()
-
-                #  Auto login
-                auth_login(request, user)
-                messages.success(request, 'Account created & logged in!')
-                return redirect('home')
-
-            except IntegrityError:
-                #  Fallback: If race condition still triggers DB unique error
-                messages.error(request, 'This phone number is already registered.')
-                return render(request, 'tupie_app/register.html', {'form': form})
-
-        else:
-            messages.error(request, 'Please fix the errors below.')
-
-    else:
-        form = UserCreationForm()
-
-    return render(request, 'tupie_app/register.html', {'form': form})
-
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            auth_login(request, user)
-            next_url = request.GET.get('next') or resolve_url('home')
-            return redirect(next_url)
-    else:
-        form = AuthenticationForm()
-    return render(request, 'tupie_app/login.html', {'form': form})
-
-def logout_view(request):
-    auth_logout(request)
-    return redirect('home')
 
 
 def owner_profile(request, user_id):
@@ -103,7 +168,7 @@ def listed_items(request):
     categories = Item._meta.get_field("category").choices 
     # If AJAX refresh -> return only grid fragment
     if request.GET.get("ajax"):
-        return render(request, "tupie_app/_items_grid.html", {"page_obj": page_obj, 'categories': categories })
+        return render(request, "tupie_app/partials/_items_grid.html", {"page_obj": page_obj, 'categories': categories })
     return render(request, 'tupie_app/listed_items.html', {'page_obj': page_obj, 'categories': categories })
   
 
@@ -122,7 +187,7 @@ def list_item(request):
             item = form.save(commit=False)
             item.owner = request.user
             item.save()
-            return redirect('home')
+            return redirect('tupie_app:home')
     else:
         form = ItemForm()
 
@@ -255,43 +320,6 @@ def search_items(request):
     return HttpResponse(html)
 
 @login_required
-def user_profile_update(request):
-    profile = request.user.userprofile
-    
-    if request.method == "POST":
-        form = UserProfileUpdateForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            updated_profile = form.save(commit=False)
-
-            # If user uploads an ID, set status to pending
-            if 'id_document' in request.FILES:
-                updated_profile.verification_status = 'pending'
-                messages.info(request, "Your verification is now pending review.")
-
-            updated_profile.save()
-            messages.success(request, "Your profile has been updated.")
-            return redirect('user_profile_update')  # reload page after save
-    else:
-        form = UserProfileUpdateForm(instance=profile)
-
-    return render(request, 'tupie_app/user_profile_update.html', {'form': form})
-
-@login_required
-def send_message(request, receiver_id):
-    receiver = get_object_or_404(User, id=receiver_id)
-    if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            message = form.save(commit=False)
-            message.sender = request.user
-            message.receiver = receiver
-            message.save()
-            return redirect('inbox')
-    else:
-        form = MessageForm()
-    return render(request, 'tupie_app/messages/send_message.html', {'form': form, 'receiver': receiver})
-
-@login_required
 def start_conversation(request, user_id):
     other_user = get_object_or_404(User, id=user_id)
 
@@ -306,7 +334,6 @@ def start_conversation(request, user_id):
         conversation.participants.set([request.user, other_user])
 
     return redirect('conversation', conversation_id=conversation.id)
-
 
 @login_required
 def inbox(request):
@@ -329,100 +356,113 @@ def inbox(request):
         'unread_count': unread_total,
     })
 
-
-
-
+# AJAX for messages
 @login_required
-def send_message(request, receiver_id):
-    receiver = get_object_or_404(User, id=receiver_id)
+def start_conversation(request, user_id):
+    other_user = get_object_or_404(User, id=user_id)
 
-    # Find or create a conversation
-    conversation = Conversation.objects.filter(participants=request.user).filter(participants=receiver).first()
-    if not conversation:
-        conversation = Conversation.objects.create()
-        conversation.participants.set([request.user, receiver])
-
-    if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            message = form.save(commit=False)
-            message.sender = request.user
-            message.receiver = receiver
-            message.conversation = conversation
-            message.save()
-            return redirect('conversation', conversation_id=conversation.id)
-    else:
-        form = MessageForm()
-
-    return render(request, 'tupie_app/messages/send_message.html', {'form': form, 'receiver': receiver})
-
-@login_required
-def conversation(request, conversation_id):
-    conversation = get_object_or_404(Conversation, id=conversation_id)
-
-    if request.user not in conversation.participants.all():
+    # Prevent chatting with self
+    if other_user == request.user:
+        messages.warning(request, "You cannot start a conversation with yourself.")
         return redirect('inbox')
 
-    # Get the other participant
+    # Get existing conversation or create new
+    conversation = Conversation.objects.filter(
+        participants=request.user
+    ).filter(
+        participants=other_user
+    ).first()
+
+    if not conversation:
+        conversation = Conversation.objects.create()
+        conversation.participants.set([request.user, other_user])
+
+    return redirect('tupie_app:conversation', conversation_id=conversation.id)
+
+# Conversation view
+@login_required
+def conversation(request, conversation_id):
+    conversation = get_object_or_404(
+        Conversation.objects.prefetch_related('messages__sender', 'messages__receiver'), 
+        id=conversation_id
+    )
+
+    if request.user not in conversation.participants.all():
+        messages.error(request, "You are not a participant in this conversation.")
+        return redirect('tupie_app:inbox')
+
+    # Identify the other participant
     other_user = conversation.participants.exclude(id=request.user.id).first()
 
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
-            message.conversation = conversation
             message.sender = request.user
             message.receiver = other_user
+            message.conversation = conversation
             message.save()
-            return redirect('conversation', conversation_id=conversation.id)
+
+            if request.is_ajax():  # If sent via AJAX
+                return JsonResponse({
+                    'success': True,
+                    'message_id': message.id,
+                    'content': message.content,
+                    'sender': request.user.username,
+                    'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                })
+
+            return redirect('tupie_app:conversation', conversation_id=conversation.id)
     else:
         form = MessageForm()
 
-    # Mark all messages from the other user as read
-    conversation.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+    # Mark unread messages as read
+    conversation.messages.filter(is_read=False, receiver=request.user).update(is_read=True)
 
-    unread_count = Message.objects.filter(receiver=request.user, is_read=False).count()
+    unread_total = Message.objects.filter(receiver=request.user, is_read=False).count()
 
     return render(request, 'tupie_app/messages/conversation.html', {
         'conversation': conversation,
-        'form': form,
         'other_user': other_user,
-        'unread_count': unread_count,
+        'form': form,
+        'unread_count': unread_total
     })
 
-# Fetchin messages in realtime
+# AJAX Send and Fetch messages
 @login_required
-def ajax_fetch_messages(request, conversation_id):
-    conversation = get_object_or_404(Conversation, id=conversation_id)
+def ajax_send_fetch_message(request, conversation_id):
+    conversation = get_object_or_404(
+        Conversation.objects.prefetch_related('messages__sender', 'messages__receiver'),
+        id=conversation_id
+    )
 
-    if request.user not in conversation.participants.all():
-        return HttpResponse(status=403)
-
-    # Mark all incoming unread messages as read (delivered)
-    conversation.messages.filter(is_read=False, receiver=request.user).update(is_read=True)
-
-    messages_html = render_to_string('tupie_app/messages/_messages_partial.html', {
-        'conversation': conversation,
-        'request': request,
-    })
-
-    return HttpResponse(messages_html)
-
-
-
-@login_required
-@require_POST
-def ajax_send_message(request, conversation_id):
-    conversation = get_object_or_404(Conversation, id=conversation_id)
     if request.user not in conversation.participants.all():
         return JsonResponse({'error': 'Unauthorized'}, status=403)
 
-    content = request.POST.get('content')
-    if content:
-        Message.objects.create(
-            conversation=conversation,
-            sender=request.user,
-            receiver=conversation.participants.exclude(id=request.user.id).first(),
-            content=content
-        )
-    return JsonResponse({'success': True})
+    # Handle sending new message
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+        if content:
+            other_user = conversation.participants.exclude(id=request.user.id).first()
+            message = Message.objects.create(
+                conversation=conversation,
+                sender=request.user,
+                receiver=other_user,
+                content=content
+            )
+
+    # Fetch all messages and mark unread as read
+    conversation.messages.filter(is_read=False, receiver=request.user).update(is_read=True)
+
+    messages_html = render_to_string(
+        'tupie_app/messages/_messages_partial.html',
+        {'conversation': conversation, 'request': request}
+    )
+
+    unread_count = Message.objects.filter(receiver=request.user, is_read=False).count()
+
+    return JsonResponse({
+        'html': messages_html,
+        'unread_count': unread_count
+    })
+

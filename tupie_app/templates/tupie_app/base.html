@@ -3,33 +3,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Tupie{% endblock %}</title>
+
     <link rel="stylesheet" href="{% static 'tupie_app/css/style.css' %}">
-    <link rel="icon" href="{% static 'tupie_app/media/icons/favicon.ico' %}" type="image/png">
-    <script src="{% static 'tupie_app/js/jquery.min.js' %}"></script>
+    <link rel="icon" href="{% static 'tupie_app/media/icons/favicon.ico' %}" type="image/x-icon">
+
+    {% block head_extra %}{% endblock %}
+    <script src="{% static 'tupie_app/js/jquery.min.js' %}" defer></script>
 </head>
 <body>
     <div class="page-wrapper">
-    {% include 'tupie_app/partials/navbar.html' %}
+        {% include 'tupie_app/partials/_navbar.html' %}
 
-    <main class="content">
-        {% block content %}{% endblock %}
-    </main>
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
 
-    {% include 'tupie_app/partials/footer.html' %}
+        {% include 'tupie_app/partials/_footer.html' %}
     </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const menuToggle = document.getElementById("menuToggle");
-  const navMenu = document.getElementById("navMenu");
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const menuToggle = document.getElementById("menuToggle");
+      const navMenu = document.getElementById("navMenu");
 
-  menuToggle.addEventListener("click", function() {
-    navMenu.classList.toggle("show");
-  });
-});
-</script>
+      if (menuToggle && navMenu) {
+        menuToggle.addEventListener("click", function() {
+          navMenu.classList.toggle("show");
+        });
+      }
+    });
+    </script>
 
+    {% block scripts %}{% endblock %}
 </body>
 </html>

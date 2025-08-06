@@ -1,7 +1,8 @@
 <div class="items-grid">
-  {% for item in items %}
+  {% for item in items|default:page_obj %}
     {% include "tupie_app/partials/_item_card.html" %}
   {% empty %}
-    <p>No items found.</p>
+    <p class="coming-soon">No items available at the moment...</p>
   {% endfor %}
 </div>
+

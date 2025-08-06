@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -7,7 +8,7 @@ SECRET_KEY = 'django-insecure-kfzw*g@%b(k2*$078is-)6qki*hvq=+ck-n8&i(k07g^6q$v!n
 DEBUG = True
 ALLOWED_HOSTS = []
 
-INSTALLED_APPS = [
+INSTALLED_APPS = [     
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,7 +34,7 @@ ROOT_URLCONF = 'tupie_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # you can add your custom template dirs here if needed
+        'DIRS': [BASE_DIR / 'templates'],  # you can add your custom template dirs here if needed
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,3 +85,17 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py (only for development)
+# Development email backend
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Email configuration (uncomment and set your email settings)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+

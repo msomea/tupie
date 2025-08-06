@@ -44,22 +44,25 @@
       {{ form.place.label_tag }} {{ form.place }}
     </div>
 
-    <button type="submit" class="submit-btn">💾 Save Changes</button>
+    <button type="submit" class="submit-btn">Save Changes</button>
   </form>
 
   <hr>
 
   <!--  Show current verification badge -->
   <h3>Verification Status</h3>
-  {% if request.user.userprofile.verification_status == "verified" or "administrator" or "organization" %}
-    <p>Verified as: 
-    {% include "tupie_app/partials/_verification_badge.html" with user_profile=request.user.userprofile %}
+{% with status=request.user.userprofile.verification_status %}
+  {% if status == "verified" or status == "administrator" or status == "organization" %}
+    <p style="color: green;">
+      {{ status|capfirst }}:
+      {% include "tupie_app/partials/_verification_badge.html" with user_profile=request.user.userprofile %}
     </p>
-  {% elif request.user.userprofile.verification_status == "pending" %}
+  {% elif status == "pending" %}
     <p style="color: orange;">⏳ Your ID is under review</p>
-  {% elif request.user.userprofile.verification_status == "unverified" %}
+  {% else %}
     <p style="color: red;">❌ You are not verified yet</p>
   {% endif %}
+{% endwith %}
 </section>
 
 <!--  Cascading dropdown AJAX -->
