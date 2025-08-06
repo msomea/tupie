@@ -22,7 +22,7 @@
           {% for req in my_outgoing_requests %}
           <tr>
             <td>
-              <a href="{% url 'item_detail' req.item.id %}">
+              <a href="{% url 'tupie_app:item_detail' req.item.id %}">
                 {{ req.item.title }}
               </a>
             </td>
@@ -45,7 +45,7 @@
         </tbody>
       </table>
     {% else %}
-      <p>No requests yet. Browse <a href="{% url 'listed_items' %}">items</a> and request one!</p>
+      <p>No requests yet. Browse <a href="{% url 'tupie_app:listed_items' %}">items</a> and request one!</p>
     {% endif %}
   </div>
 </section>

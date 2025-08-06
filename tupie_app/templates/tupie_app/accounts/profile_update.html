@@ -24,6 +24,9 @@
     {% else %}
         <p style="color:#999;">No ID uploaded yet</p>
     {% endif %}
+    <p>
+      <strong>Email: </strong> {{ user.email }}
+    </p>
     </div>
 
   <!--  Profile update form -->
@@ -32,7 +35,7 @@
     
     <div class="form-grid">
       {{ form.full_name.label_tag }} {{ form.full_name }}
-      {{ form.email.label_tag }} {{ form.email }}
+      
       {{ form.phone_number.label_tag }} {{ form.phone_number }}
 
       {{ form.photo.label_tag }} {{ form.photo }}

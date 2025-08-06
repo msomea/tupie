@@ -253,30 +253,48 @@ def list_item(request):
 def request_item(request, pk):
     item = get_object_or_404(Item, id=pk)
 
-    #   Prevent requesting your own item
+    # Prevent requesting your own item
     if item.owner == request.user:
         messages.error(request, "You cannot request your own item.")
-        return redirect("item_detail", pk=item.id)
+        return redirect("tupie_app:item_detail", pk=item.id)
 
-    #   Check if item is already unavailable
+    # Check if item is already unavailable
     if not item.available:
         messages.warning(request, "This item is no longer available.")
-        return redirect("item_detail", pk=item.id)
+        return redirect("tupie_app:item_detail", pk=item.id)
 
-    #   Prevent duplicate request from same user
+    # Prevent duplicate request from same user
     existing = ItemRequest.objects.filter(item=item, requester=request.user)
     if existing.exists():
         messages.info(request, "You have already requested this item.")
-        return redirect("item_detail", pk=item.id)
-    else:
-        ItemRequest.objects.create(
-            item=item,
-            requester=request.user,
-            owner=item.owner,
-            message="Requesting this item."  # Can later add custom messages
-        )
-        messages.success(request, "  Your request has been sent to the owner!")
-        return redirect("outgoing_requests_dashboard")
+        return redirect("tupie_app:item_detail", pk=item.id)
+    
+    # Create the item request
+    ItemRequest.objects.create(
+        item=item,
+        requester=request.user,
+        owner=item.owner,
+        message="Requesting this item."
+    )
+
+    # --- Send email notification to the item owner ---
+    subject = f"New Request for Your Item: {item.title}"
+    message = (
+        f"Hello {item.owner.get_full_name() or item.owner.username},\n\n"
+        f"{request.user.get_full_name() or request.user.username} has requested your item: '{item.title}'.\n"
+        f"Please log in to review the request.\n\n"
+        f"Tupie Team"
+    )
+    recipient_email = item.owner.email
+    sender_email = settings.DEFAULT_FROM_EMAIL
+
+    try:
+        send_mail(subject, message, sender_email, [recipient_email])
+    except Exception as e:
+        print("Email sending failed:", e)  # Optionally log the error
+
+    messages.success(request, "Your request has been sent to the owner!")
+    return redirect("tupie_app:outgoing_requests_dashboard")
 
 @login_required
 def requests_dashboard(request):
@@ -302,9 +320,9 @@ def update_request_status(request, request_id, action):
         messages.warning(request, f"You declined {item_request.requester.username}'s request.")
     else:
         messages.error(request, "Invalid action.")
-        return redirect("requests_dashboard")
+        return redirect("tupie_app:requests_dashboard")
     
-    return redirect("requests_dashboard")
+    return redirect("tupie_app:requests_dashboard")
 
 @login_required
 def outgoing_requests_dashboard(request):
@@ -365,27 +383,17 @@ def search_items(request):
     if category_filter:
         items = items.filter(category=category_filter)
 
-    items = items.order_by("-created_at")[:30]  # Limit for AJAX
+    items = items.order_by("-created_at")
 
-    # Render only the grid part
-    html = render_to_string("tupie_app/partials/items_grid.html", {"items": items})
+    paginator = Paginator(items, 30)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    html = render_to_string(
+        "tupie_app/partials/_items_grid.html",
+        {"page_obj": page_obj}
+    )
     return HttpResponse(html)
-
-@login_required
-def start_conversation(request, user_id):
-    other_user = get_object_or_404(User, id=user_id)
-
-    # Avoid chatting with self
-    if other_user == request.user:
-        return redirect('inbox')
-
-    # Check if conversation exists
-    conversation = Conversation.objects.filter(participants=request.user).filter(participants=other_user).first()
-    if not conversation:
-        conversation = Conversation.objects.create()
-        conversation.participants.set([request.user, other_user])
-
-    return redirect('conversation', conversation_id=conversation.id)
 
 @login_required
 def inbox(request):
@@ -455,7 +463,7 @@ def conversation(request, conversation_id):
             message.conversation = conversation
             message.save()
 
-            if request.is_ajax():  # If sent via AJAX
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':  # FIXED HERE
                 return JsonResponse({
                     'success': True,
                     'message_id': message.id,
@@ -465,6 +473,7 @@ def conversation(request, conversation_id):
                 })
 
             return redirect('tupie_app:conversation', conversation_id=conversation.id)
+
     else:
         form = MessageForm()
 

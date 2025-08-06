@@ -42,11 +42,11 @@
   <!-- Messaging -->
 <div>
   {% if user.is_authenticated  and user != owner.user %}
-    <a href="{% url 'start_conversation' owner.user.id %}">
+    <a href="{% url 'tupie_app:start_conversation' owner.user.id %}">
     <button class="cta-btn">Message {{ owner.user.username }}</button>
     </a>
   {% elif not user.is_authenticated  %}
-    <a href="{% url 'start_conversation' owner.user.id %}">
+    <a href="{% url 'tupie_app:start_conversation' owner.user.id %}">
     <button class="cta-btn">Message {{ owner.user.username }}</button>
     </a>
   {% endif %}

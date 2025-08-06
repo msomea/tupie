@@ -27,7 +27,7 @@ class SignUpForm(UserCreationForm):
 class UserProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['photo', 'phone_number', 'full_name', 'id_document', 'email', 'region', 'district', 'ward', 'place']
+        fields = ['photo', 'phone_number', 'full_name', 'id_document', 'region', 'district', 'ward', 'place']
         widgets = {
             'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your full name as it appears on ID'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your phone number'}),
@@ -38,6 +38,10 @@ class UserProfileUpdateForm(forms.ModelForm):
             'ward': forms.Select(attrs={'class': 'form-control'}),
             'place': forms.Select(attrs={'class': 'form-control'}),
         }
+    
+    def clean_email(self):
+        return self.instance.email  # Forces it to stay unchanged
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

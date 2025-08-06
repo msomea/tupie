@@ -21,7 +21,7 @@
             {% if item.unread_count %}
               <span class="bg-gold text-black text-sm px-2 py-1 rounded-full">{{ item.unread_count }} new</span><br>
             {% endif %}
-            <a href="{% url 'conversation' item.conversation.id %}" ><button class="cta-btn">View</button></a>
+            <a href="{% url 'tupie_app:conversation' item.conversation.id %}" ><button class="cta-btn">View</button></a>
           </div>
         </li>
       {% endfor %}
