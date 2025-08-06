@@ -1,0 +1,15 @@
+{% extends "tupie_app/base.html" %}
+{% block title %}Resend Verification{% endblock %}
+{% block content %}
+<h2>Resend Verification Email</h2>
+<section class="form-section">
+<form method="post" class="item-form">
+    {% csrf_token %}
+    <p>
+        <label for="id_email">Email:</label>
+        <input type="email" name="email" id="id_email" required placeholder="Enter your registered email">
+    </p>
+    <button type="submit" class="cta-btn">Resend Email</button>
+</form>
+</section>
+{% endblock %}

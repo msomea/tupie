@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, resolve_url, get_object_or_404
-from django.contrib.auth import login as auth_login, logout as auth_logout, get_user_model
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_user_model
 from django.contrib.auth.models import User
 from .models import Item, Region, District, Ward, Street, Place,ItemRequest, Message, Conversation, User, UserProfile
 from .forms import SignUpForm, UserProfileUpdateForm, ItemForm, MessageForm
@@ -21,23 +21,75 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 
+
 #Account managements
 def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            auth_login(request, user)
-            next_url = request.GET.get('next') or resolve_url('tupie_app:home')
-            return redirect(next_url)
-    else:
-        form = AuthenticationForm()
-    return render(request, 'tupie_app/accounts/login.html', {'form': form})
+    form = AuthenticationForm(request, data=request.POST or None)
 
+    if request.method == "POST":
+        username_or_email = request.POST.get("username")
+        password = request.POST.get("password")
+
+        # First try to find the user by username or email
+        user_qs = User.objects.filter(username=username_or_email)
+        if not user_qs.exists():
+            user_qs = User.objects.filter(email=username_or_email)
+
+        if user_qs.exists():
+            actual_user = user_qs.first()
+            if not actual_user.is_active:
+                messages.error(request, "Your account is not verified yet. Please check your email.")
+                return redirect("tupie_app:resend_verification")
+
+        # Try to authenticate
+        user = authenticate(request, username=username_or_email, password=password)
+
+        if not user:
+            # Try email login fallback
+            try:
+                u = User.objects.get(email=username_or_email)
+                user = authenticate(request, username=u.username, password=password)
+            except User.DoesNotExist:
+                user = None
+
+        if user:
+            auth_login(request, user)
+            return redirect("tupie_app:home")
+        else:
+            messages.error(request, "Invalid credentials. Please try again.")
+
+    return render(request, "tupie_app/accounts/login.html", {'form': form})
+# Resend verification email
+def resend_verification(request):
+    if request.method == "POST":
+        email = request.POST.get("email").strip()
+        try:
+            user = User.objects.get(email=email)
+            if user.is_active:
+                messages.info(request, "This account is already verified. You can log in.")
+            else:
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                verify_url = request.build_absolute_uri(
+                    reverse('tupie_app:verify_email', kwargs={'uidb64': uid, 'token': token})
+                )
+                subject = "Verify your email address"
+                message = render_to_string("tupie_app/accounts/email_verification.html", {
+                    "user": user,
+                    "verify_url": verify_url,
+                })
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+                messages.success(request, "Verification email has been resent. Please check your inbox.")
+        except User.DoesNotExist:
+            messages.error(request, "No account found with that email.")
+
+        return redirect("tupie_app:login")
+
+    return render(request, "tupie_app/accounts/resend_verification.html")
 
 def logout_view(request):
     auth_logout(request)
-    return redirect('tupe_app:home')
+    return redirect('tupie_app:home')
 
 def signup_view(request):
     if request.method == 'POST':
