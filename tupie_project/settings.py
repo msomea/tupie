@@ -49,11 +49,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tupie_project.wsgi.application'
 
-# Use PostgreSQL for everything, default DB is 'locations'
+# Use PostgreSQL for everything, default DB is 'tupie'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'locations',
+        'NAME': 'tupie',
         'USER': 'postgres',
         'PASSWORD': 'msomea', 
         'HOST': 'localhost',
@@ -86,11 +86,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# settings.py (only for development)
+# only for development
 # Development email backend
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Email configuration (uncomment and set your email settings)
+'''
+# Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -98,4 +99,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
+'''

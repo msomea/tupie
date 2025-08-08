@@ -128,7 +128,7 @@ h2, h3 {
   }
 }
 
-/* User profile badge*/
+/* User profile badge */
 .badge {
   font-weight: bold;
   margin-left: 5px;
@@ -138,7 +138,6 @@ h2, h3 {
 .blue-check {
   color: #1E90FF; /* DodgerBlue */
 }
-
 .gold-check {
   color: #FFD700; /* Gold */
 }
@@ -229,12 +228,11 @@ h2, h3 {
 .items-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    
+    gap: 27px;
     justify-content: center;
     justify-items: center;
-    max-width: 1200px;
-    margin: 30px auto;
+    max-width: 1440px;
+    margin: 10px auto;
     padding: 0 10px;
     }
 .item-card {
@@ -277,7 +275,6 @@ h2, h3 {
     color: #4A704A;
     font-size: 1.1rem;
     margin: 5px 0;
-
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; /*   force single line */
@@ -286,7 +283,6 @@ h2, h3 {
 .item-card p {
     font-size: 0.9rem;
     color: #666;
-
     display: -webkit-box;
     -webkit-line-clamp: 1;   /*   max 2 lines */
     line-clamp: 1;
@@ -313,7 +309,7 @@ h2, h3 {
     color: #aaa;  /*   lighter arrows */
 }
 /*  Owner name on item card */
-.owner {
+.owner, .inline-link {
   font-size: 0.9rem;        /* slightly smaller than title */
   font-weight: bold;
   color: #4A704A;           /* theme green */
@@ -323,7 +319,7 @@ h2, h3 {
   transition: color 0.3s ease;
 }
 
-.owner:hover {
+.owner:hover, .inline-link:hover {
   color: #3A5A3A;           /* darker on hover */
   text-decoration: underline; /* subtle hover effect */
 }
@@ -363,6 +359,7 @@ h2, h3 {
 /* Table Rows */
 .requests-table td {
   padding: 12px 15px;
+  text-align: left;
   border-bottom: 1px solid #eee;
   font-size: 0.95rem;
 }
@@ -530,7 +527,7 @@ h2, h3 {
   border-radius: 10px;  /* slight rounded corners */
 }
 
-/*  Form grid styling (same theme) */
+/*  Form grid styling  */
 .profile-form .form-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -545,7 +542,7 @@ h2, h3 {
   display: block;
 }
 
-/*  Submit button matches theme */
+/*  Submit button */
 .profile-form .submit-btn {
   background: #4A704A;
   color: white;

@@ -1,35 +1,54 @@
-{% extends 'tupie_app/base.html' %}
-
+{% extends "tupie_app/base.html" %}
 {% load static %}
-{% block title %}Inbox{% endblock %}
+{% load humanize %}
 
 {% block content %}
-<div>
+<div class="container">
   <h2>Inbox</h2>
 
-  {% if convo_data %}
-    <ul class="form-section">
-      {% for item in convo_data %}
-        <li class="inbox-list">
-          <div>
-            {% for other_user in item.other_users %}
-              <p><strong>{{ other_user.username }}</strong></p>
-              <p><small>{{ other_user.email }}</small></p>
-            {% endfor %}
-          </div>
-          <div>
-            {% if item.unread_count %}
-              <span class="bg-gold text-black text-sm px-2 py-1 rounded-full">{{ item.unread_count }} new</span><br>
-            {% endif %}
-            <a href="{% url 'tupie_app:conversation' item.conversation.id %}" ><button class="cta-btn">View</button></a>
-          </div>
-        </li>
+{% if convo_data %}
+  <table class="requests-table">
+    <thead>
+      <tr>
+        <th>Participant</th>
+        <th>Last Message</th>
+        <th>Time</th>
+        <th>Unread</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for convo in convo_data %}
+        {% with other_user=convo.other_users.0 %}
+          <tr onclick="location.href='{% url 'tupie_app:conversation' conversation_id=convo.conversation.id %}'" style="cursor:pointer;">
+            <td>
+              {{ other_user.username }}
+              {% include "tupie_app/partials/_verification_badge.html" with user_profile=other_user.userprofile %}
+            </td>
+            <td>
+              {% if convo.last_message %}
+                {{ convo.last_message.content|truncatechars:40 }}
+              {% else %}
+                No messages yet
+              {% endif %}
+            </td>
+            <td>
+              {% if convo.last_message %}
+                {{ convo.last_message.timestamp|naturaltime }}
+              {% endif %}
+            </td>
+            <td>
+              {% if convo.unread_count > 0 %}
+                <span class="badge bg-danger">{{ convo.unread_count }}</span>
+              {% else %}
+                <span class="text-muted">0</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endwith %}
       {% endfor %}
-    </ul>
-  {% else %}
-    <p>No conversations yet.</p>
-  {% endif %}
-</div>
-
+    </tbody>
+  </table>
+{% else %}
+  <p>No conversations yet.</p>
+{% endif %}
 {% endblock %}
-

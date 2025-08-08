@@ -197,7 +197,7 @@ def update_profile(request):
 
 # Other views
 def home(request):
-    items = Item.objects.filter(available=True).order_by('-created_at')[:6]
+    items = Item.objects.filter(available=True).order_by('-created_at')[:8]
     return render(request, 'tupie_app/home.html', {'items': items})
 
 def about(request):
@@ -403,15 +403,18 @@ def inbox(request):
     for convo in conversations:
         other_users = convo.participants.exclude(id=request.user.id)
         unread_count = convo.messages.filter(is_read=False, receiver=request.user).count()
+        last_message = convo.messages.order_by('-timestamp').first() #new
         convo_data.append({
             'conversation': convo,
             'other_users': other_users,
             'unread_count': unread_count,
+            'last_message': last_message, #new
         })
 
     unread_total = Message.objects.filter(receiver=request.user, is_read=False).count()
 
     return render(request, 'tupie_app/messages/inbox.html', {
+        'conversations': conversations, #new
         'convo_data': convo_data,
         'unread_count': unread_total,
     })

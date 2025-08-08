@@ -2,23 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-# Country
-class Country(models.Model):
-    id = models.AutoField(primary_key=True)
-    iso = models.CharField(max_length=2, null=False)
-    name = models.TextField(max_length=100, null=False)
-    nicename = models.TextField(max_length=100, null=False)
-    iso3 = models.CharField(max_length=3, null=True)
-    numcode = models.IntegerField(null=True)
-    phonecode = models.IntegerField(null=False)
-
-    class Meta:
-        db_table = 'countries'
-        managed = False
-
-    def __str__(self):
-        return self.name
-
 # Region model
 class Region(models.Model):
     region_code = models.IntegerField(primary_key=True)

@@ -23,7 +23,7 @@ The name **Tupie** comes from the Swahili words **"Tupa" (throw away)** and **"M
 
 1. Clone the repository:
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/msomea/tupie.git
    cd tupie
    ```
 
@@ -37,8 +37,12 @@ The name **Tupie** comes from the Swahili words **"Tupa" (throw away)** and **"M
    ```bash
    pip install -r requirements.txt
    ```
-
-4. Run the development server (Django example):
+4. Install locations table into your default database
+   database dump is included in dtbase directory (postgres):
+   ```bash
+   psql -U your_user -d your_dat_base -f location_tables.sql
+   ```
+5. Run the development server (Django example):
    ```bash
    python manage.py runserver
    ```

@@ -27,7 +27,7 @@
               </a>
             </td>
             <td>
-             {{ req.owner.username }}
+              {{ req.owner.username }}
               {% include "tupie_app/partials/_verification_badge.html" with user_profile=req.owner.userprofile %}
             </td>
             <td>
@@ -45,7 +45,7 @@
         </tbody>
       </table>
     {% else %}
-      <p>No requests yet. Browse <a href="{% url 'tupie_app:listed_items' %}">items</a> and request one!</p>
+      <p>No requests yet. Browse <a href="{% url 'tupie_app:listed_items' %}" class="inline-link">items</a> and request one!</p>
     {% endif %}
   </div>
 </section>
