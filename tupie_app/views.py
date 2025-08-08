@@ -213,7 +213,7 @@ def owner_profile(request, user_id):
 
 def listed_items(request):
     item_list = Item.objects.filter(available=True).order_by('-created_at')
-    paginator = Paginator(item_list, 6)
+    paginator = Paginator(item_list, 3)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     #  Get category choices from model

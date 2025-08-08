@@ -227,12 +227,12 @@ h2, h3 {
 }
 .items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 27px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     justify-content: center;
+    gap: 30px;
     justify-items: center;
     max-width: 1440px;
-    margin: 10px auto;
+    margin: 30px auto;
     padding: 0 10px;
     }
 .item-card {

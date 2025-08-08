@@ -37,7 +37,7 @@ The name **Tupie** comes from the Swahili words **"Tupa" (throw away)** and **"M
    ```bash
    pip install -r requirements.txt
    ```
-4. Install locations table into your default database
+4. Install locations table into your default database,
    database dump is included in dtbase directory (postgres):
    ```bash
    psql -U your_user -d your_dat_base -f location_tables.sql
