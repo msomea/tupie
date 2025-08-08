@@ -49,7 +49,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tupie_project.wsgi.application'
 
-# Use PostgreSQL for everything, default DB is 'tupie'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

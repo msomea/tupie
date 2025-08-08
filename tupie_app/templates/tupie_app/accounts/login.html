@@ -10,14 +10,41 @@
     <h2>Login</h2>
     <p>Enter your credentials</p>
 
-    <form method="post" class="item-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="submit-btn">Log In</button>
-    </form>
-    <p class="alt-link">
-        Don’t have an account?<br><br>
-        <a href="{% url 'tupie_app:signup' %}"><button class="cta-btn">Sign Up</button></a>
-    </p>
+    <form method="post" action="{% url 'tupie_app:login' %}" class="item-form">
+    {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="error">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+
+    <div class="form-group">
+        <input type="text" name="username" 
+               placeholder="Username or Email" 
+               required
+               class="form-control" 
+               value="{{ form.username.value|default:'' }}">
+        {% if form.username.errors %}
+            <div class="error">{{ form.username.errors.0 }}</div>
+        {% endif %}
+    </div>
+    <br>
+    <div class="form-group">
+        <input type="password" name="password" 
+               placeholder="Password" 
+               required
+               class="form-control">
+        {% if form.password.errors %}
+            <div class="error">{{ form.password.errors.0 }}</div>
+        {% endif %}
+    </div>
+    <br>
+    <button type="submit" class="cta-btn">Login</button>
+    <br>
+    <a href="{% url 'tupie_app:password_reset' %}" class="inline-link">Forgot password?</a>
+</form>
+<hr>
+<br>
+<a href="{% url 'tupie_app:signup' %}"><button class="cta-btn">Create new account</button></a>
+
+
 </section>
 {% endblock %}
