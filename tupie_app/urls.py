@@ -56,7 +56,7 @@ urlpatterns = [
     path("update_request/<int:request_id>/<str:action>/", views.update_request_status, name="update_request_status"),
     path("my-requests/", views.outgoing_requests_dashboard, name="outgoing_requests_dashboard"),
 
-
+    path("saved_items/", views.saved_items, name='saved_items'),
     # AJAX API for Regions
     path("get_districts/", views.get_districts, name="get_districts"),
     path("get_wards/", views.get_wards, name="get_wards"),
@@ -64,6 +64,7 @@ urlpatterns = [
 
     # Search for items
     path("search-items/", views.search_items, name="search_items"),
+    path("saved-search-items/", views.saved_search_items, name="saved_search_items"),
 
     # Message URLs
     path('messages/', views.inbox, name='inbox'),

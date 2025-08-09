@@ -210,7 +210,7 @@ def owner_profile(request, user_id):
 
 def listed_items(request):
     item_list = Item.objects.filter(available=True).order_by('-created_at')
-    paginator = Paginator(item_list, 3)
+    paginator = Paginator(item_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     #  Get category choices from model
@@ -362,6 +362,20 @@ def update_request_status(request, request_id, action):
     
     return redirect("tupie_app:requests_dashboard")
 
+def saved_items(request):
+    requested_items = Item.objects.filter(available=False).order_by('-id')  # newest first
+
+    # Pagination (e.g., 10 items per page)
+    paginator = Paginator(requested_items, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    #  Get category choices from model
+    categories = Item._meta.get_field("category").choices 
+    # If AJAX refresh -> return only grid fragment
+    if request.GET.get("ajax"):
+        return render(request, "tupie_app/partials/_items_grid.html", {"page_obj": page_obj, 'categories': categories })
+    return render(request, 'tupie_app/saved_items.html', {'page_obj': page_obj, 'categories': categories })
+
 @login_required(login_url='/login/')
 def outgoing_requests_dashboard(request):
     my_outgoing_requests = ItemRequest.objects.filter(
@@ -408,6 +422,36 @@ def search_items(request):
     category_filter = request.GET.get("category", "").strip()
 
     items = Item.objects.filter(available=True)
+
+    if query:
+        items = items.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(region__region_name__icontains=query) |
+            Q(district__district_name__icontains=query) |
+            Q(ward__ward_name__icontains=query)
+        )
+
+    if category_filter:
+        items = items.filter(category=category_filter)
+
+    items = items.order_by("-created_at")
+
+    paginator = Paginator(items, 30)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    html = render_to_string(
+        "tupie_app/partials/_items_grid.html",
+        {"page_obj": page_obj}
+    )
+    return HttpResponse(html)
+
+def saved_search_items(request):
+    query = request.GET.get("q", "").strip()
+    category_filter = request.GET.get("category", "").strip()
+
+    items = Item.objects.filter(available=False)
 
     if query:
         items = items.filter(

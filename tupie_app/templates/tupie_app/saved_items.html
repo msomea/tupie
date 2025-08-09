@@ -1,0 +1,93 @@
+{% extends "tupie_app/base.html" %}
+{% load static %}
+{% block title %}Tupies{% endblock %}
+{% block content %}
+<section class="all-items">
+    <div>
+    <h2>Requested & Accepted Items</h2>
+    <p>Thanks to Tupie all these Items has found new home</p>
+
+        <!--  Search & Filter Form -->
+        <form id="live-search-form" class="filter-form" onsubmit="return false;">
+            <input 
+                type="text" 
+                name="q" 
+                id="saved-search-query"
+                placeholder="Search by title or location...">
+
+            <select name="category" id="saved-search-category">
+                <option value="">All Categories</option>
+                {% for value, label in categories %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="button" id="saved-search-btn">🔍 Search</button>
+            </form>
+
+            <!--  AJAX results -->
+            <div id="saved-items-container">
+            <div class="items-grid">
+                {% for item in page_obj %}
+                {% include "tupie_app/partials/_item_card.html" %}
+                {% empty %}
+                <p>No items found.</p>
+                {% endfor %}
+            </div>
+            </div>
+    </div>
+
+    <!--  PAGINATION CONTROLS -->
+      {% if page_obj.has_other_pages %}
+      <div class="pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">&laquo; Prev</a>
+        {% else %}
+          <span class="disabled">&laquo; Prev</span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <span class="active">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+        {% else %}
+          <span class="disabled">Next &raquo;</span>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!--  JS for live search -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const queryInput = document.getElementById("saved-search-query");
+  const categorySelect = document.getElementById("saved-search-category");
+  const searchBtn = document.getElementById("saved-search-btn");
+  const itemsContainer = document.getElementById("saved-items-container");
+
+  function fetchFilteredItems() {
+    const query = queryInput.value;
+    const category = categorySelect.value;
+
+    fetch(`/saved-search-items/?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}`)
+      .then(response => response.text())
+      .then(html => {
+        itemsContainer.innerHTML = html; // Replace with new filtered grid
+      });
+  }
+
+  // Trigger search on typing, selecting, or clicking button
+  queryInput.addEventListener("input", fetchFilteredItems);
+  categorySelect.addEventListener("change", fetchFilteredItems);
+  searchBtn.addEventListener("click", fetchFilteredItems);
+});
+</script>
+{% endblock %}
