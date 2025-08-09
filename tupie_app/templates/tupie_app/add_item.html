@@ -5,35 +5,37 @@
 
 {% block content %}
 <section class="form-section">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     <h2>List an Item</h2>
     <p>Fill in the details to give your item a new home</p>
 
     <form method="post" enctype="multipart/form-data" class="item-form" id="item-form">
         {% csrf_token %}
-        {{ form.non_field_errors }}
+        {{ item_form.non_field_errors }}
 
+        <h3>Item Details</h3>
         <p>
-            {{ form.title.label_tag }}
-            {{ form.title }}
-            {{ form.title.errors }}
+            {{ item_form.title.label_tag }}
+            {{ item_form.title }}
+            {{ item_form.title.errors }}
         </p>
 
         <p>
-            {{ form.description.label_tag }}
-            {{ form.description }}
-            {{ form.description.errors }}
+            {{ item_form.description.label_tag }}
+            {{ item_form.description }}
+            {{ item_form.description.errors }}
         </p>
 
         <p>
-            {{ form.category.label_tag }}
-            {{ form.category }}
-            {{ form.category.errors }}
-        </p>
-
-        <p>
-            {{ form.image.label_tag }}
-            {{ form.image }}
-            {{ form.image.errors }}
+            {{ item_form.category.label_tag }}
+            {{ item_form.category }}
+            {{ item_form.category.errors }}
         </p>
 
         <p>
@@ -90,12 +92,18 @@
         </p>
 
         <p>
-            {{ form.street.label_tag }}
-            {{ form.street }}
-            {{ form.street.errors }}
+            {{ item_form.street.label_tag }}
+            {{ item_form.street }}
+            {{ item_form.street.errors }}
         </p>
 
-        <button type="submit" class="submit-btn">Submit Item</button>
+        <h3>Add Images</h3>
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {{ form.as_p }}
+        {% endfor %}
+
+    <button type="submit" class="submit-btn">Add Item</button>
     </form>
 </section>
 

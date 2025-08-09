@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect, resolve_url, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_user_model
 from django.contrib.auth.models import User
-from .models import Item, Region, District, Ward, Street, Place,ItemRequest, Message, Conversation, User, UserProfile
-from .forms import SignUpForm, UserProfileUpdateForm, ItemForm, MessageForm
+from .models import Item, ItemImage, Region, District, Ward, Street, Place,ItemRequest, Message, Conversation, User, UserProfile
+from .forms import SignUpForm, UserProfileUpdateForm, ItemForm, ItemImagesForm, RequiredImageFormSet, MessageForm, ItemImageFormSet, ItemForm, MessageForm
+from django.forms import modelformset_factory
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
-from .forms import ItemForm, MessageForm
 from django.template.loader import render_to_string
 from django.db.models import Q
 from django.db import IntegrityError
@@ -30,35 +30,32 @@ def login_view(request):
         username_or_email = request.POST.get("username")
         password = request.POST.get("password")
 
-        # First try to find the user by username or email
+        # Try to find user by username or email
         user_qs = User.objects.filter(username=username_or_email)
         if not user_qs.exists():
             user_qs = User.objects.filter(email=username_or_email)
 
-        if user_qs.exists():
-            actual_user = user_qs.first()
-            if not actual_user.is_active:
-                messages.error(request, "Your account is not verified yet. Please check your email.")
-                return redirect("tupie_app:resend_verification")
+        if not user_qs.exists():
+            messages.error(request, "User is not registered.")
+            return redirect("tupie_app:login")
 
-        # Try to authenticate
-        user = authenticate(request, username=username_or_email, password=password)
+        actual_user = user_qs.first()
+        if not actual_user.is_active:
+            messages.error(request, "Your account is not verified yet. Please check your email.")
+            return redirect("tupie_app:resend_verification")
 
-        if not user:
-            # Try email login fallback
-            try:
-                u = User.objects.get(email=username_or_email)
-                user = authenticate(request, username=u.username, password=password)
-            except User.DoesNotExist:
-                user = None
+        # Authenticate with username
+        user = authenticate(request, username=actual_user.username, password=password)
 
         if user:
             auth_login(request, user)
             return redirect("tupie_app:home")
         else:
             messages.error(request, "Invalid credentials. Please try again.")
+            return redirect("tupie_app:login")
 
     return render(request, "tupie_app/accounts/login.html", {'form': form})
+
 # Resend verification email
 def resend_verification(request):
     if request.method == "POST":
@@ -175,7 +172,7 @@ def verify_email(request, uidb64, token):
         return redirect('tupie_app:login')
 
 
-@login_required
+@login_required(login_url='/login/')
 def update_profile(request):
     profile = request.user.userprofile
     if request.method == "POST":
@@ -226,30 +223,71 @@ def listed_items(request):
 
 def item_detail(request, pk):
     #Show full details of a single item
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(Item.objects.prefetch_related('images'), pk=pk)
     return render(request, "tupie_app/item_detail.html", {"item": item})
 
+ItemImageFormSet = modelformset_factory(
+    ItemImage,
+    form=ItemImagesForm,
+    extra=3,
+    max_num=3,
+    can_delete=True
+)
+
 @login_required(login_url='/login/')
-def list_item(request):
+def add_item(request):
+    ItemImageFormSet = modelformset_factory(
+        ItemImage,
+        form=ItemImagesForm,
+        extra=3,
+        max_num=3,
+        can_delete=True
+    )
     regions = Region.objects.all().order_by('region_name')
 
     if request.method == 'POST':
-        form = ItemForm(request.POST, request.FILES)
-        if form.is_valid():
-            item = form.save(commit=False)
-            item.owner = request.user
-            item.save()
-            return redirect('tupie_app:home')
+        item_form = ItemForm(request.POST, request.FILES)
+        formset = ItemImageFormSet(request.POST, request.FILES, queryset=ItemImage.objects.none())
+
+        if item_form.is_valid() and formset.is_valid():
+            # Check if at least one image is uploaded in the formset
+            has_image = False
+            for form in formset:
+                if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                    if form.cleaned_data.get('image'):
+                        has_image = True
+                        break
+
+            if not has_image:
+                messages.error(request, 'Please upload at least one image.')
+            else:
+                item = item_form.save(commit=False)
+                item.owner = request.user
+                item.save()
+
+                for form in formset:
+                    if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                        image = form.cleaned_data.get('image')
+                        if image:
+                            ItemImage.objects.create(item=item, image=image)
+
+                messages.success(request, 'Item and images uploaded successfully!')
+                return redirect('tupie_app:home')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+
     else:
-        form = ItemForm()
+        item_form = ItemForm()
+        formset = ItemImageFormSet(queryset=ItemImage.objects.none())
 
     context = {
-        'form': form,
+        'item_form': item_form,
+        'formset': formset,
         'regions': regions,
     }
-    return render(request, 'tupie_app/list_item.html', context)
+    return render(request, 'tupie_app/add_item.html', context)
     
-@login_required
+@login_required(login_url='/login/')
 def request_item(request, pk):
     item = get_object_or_404(Item, id=pk)
 
@@ -296,13 +334,13 @@ def request_item(request, pk):
     messages.success(request, "Your request has been sent to the owner!")
     return redirect("tupie_app:outgoing_requests_dashboard")
 
-@login_required
+@login_required(login_url='/login/')
 def requests_dashboard(request):
     # Show only requests for the logged-in user's items
     my_requests = ItemRequest.objects.filter(owner=request.user).select_related('item', 'requester').order_by('-created_at')
     return render(request, "tupie_app/requests_dashboard.html", {"my_requests": my_requests})
 
-@login_required
+@login_required(login_url='/login/')
 def update_request_status(request, request_id, action):
     item_request = get_object_or_404(ItemRequest, id=request_id, owner=request.user)
 
@@ -324,7 +362,7 @@ def update_request_status(request, request_id, action):
     
     return redirect("tupie_app:requests_dashboard")
 
-@login_required
+@login_required(login_url='/login/')
 def outgoing_requests_dashboard(request):
     my_outgoing_requests = ItemRequest.objects.filter(
         requester=request.user
@@ -395,7 +433,7 @@ def search_items(request):
     )
     return HttpResponse(html)
 
-@login_required
+@login_required(login_url='/login/')
 def inbox(request):
     conversations = Conversation.objects.filter(participants=request.user)
     
@@ -420,7 +458,7 @@ def inbox(request):
     })
 
 # AJAX for messages
-@login_required
+@login_required(login_url='/login/')
 def start_conversation(request, user_id):
     other_user = get_object_or_404(User, id=user_id)
 
@@ -443,7 +481,7 @@ def start_conversation(request, user_id):
     return redirect('tupie_app:conversation', conversation_id=conversation.id)
 
 # Conversation view
-@login_required
+@login_required(login_url='/login/')
 def conversation(request, conversation_id):
     conversation = get_object_or_404(
         Conversation.objects.prefetch_related('messages__sender', 'messages__receiver'), 
@@ -493,7 +531,7 @@ def conversation(request, conversation_id):
     })
 
 # AJAX Send and Fetch messages
-@login_required
+@login_required(login_url='/login/')
 def ajax_send_fetch_message(request, conversation_id):
     conversation = get_object_or_404(
         Conversation.objects.prefetch_related('messages__sender', 'messages__receiver'),

@@ -1,8 +1,9 @@
 from django import forms
-from .models import Item, Region, District, Ward, Place, Street, Message, UserProfile
+from .models import Item, ItemImage, Region, District, Ward, Place, Street, Message, UserProfile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
+from django.forms import modelformset_factory, BaseModelFormSet, ValidationError
 
 # SignUp form for new users
 class SignUpForm(UserCreationForm):
@@ -32,11 +33,12 @@ class UserProfileUpdateForm(forms.ModelForm):
             'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your full name as it appears on ID'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your phone number'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'}),
-            'photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'region': forms.Select(attrs={'class': 'form-control'}),
-            'district': forms.Select(attrs={'class': 'form-control'}),
-            'ward': forms.Select(attrs={'class': 'form-control'}),
-            'place': forms.Select(attrs={'class': 'form-control'}),
+            'photo': forms.ClearableFileInput(attrs={'class': 'form-control', 'placeholder': 'Select Image'}),
+            'region': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Region' }),
+            'district': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select District'}),
+            'ward': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Ward'}),
+            'place': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Place'}),
+            'id_document': forms.ClearableFileInput(attrs={'class': 'form-control', 'placeholder': 'Select your ID'}),
         }
     
     def clean_email(self):
@@ -77,64 +79,105 @@ class UserProfileUpdateForm(forms.ModelForm):
                 pass
         elif self.instance.pk and self.instance.ward:
             self.fields['place'].queryset = Place.objects.filter(ward=self.instance.ward).order_by('place_name')
-    
-# ItemForm for creating and updating items
+
+# Item Form for creating and updating items
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['title', 'description', 'category', 'image', 'region', 'district', 'ward', 'place', 'street']
+        fields = [
+            'title', 'description', 'category', 'region', 'district', 'ward', 
+            'place', 'street', 'image1', 'image2', 'image3'
+        ]
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter item title'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Describe the item'}),
-            'category': forms.Select(attrs={'class': 'form-control'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'region': forms.Select(attrs={'class': 'form-control'}),
-            'district': forms.Select(attrs={'class': 'form-control'}),
-            'ward': forms.Select(attrs={'class': 'form-control'}),
-            'place': forms.Select(attrs={'class': 'form-control'}),
-            'street': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter street'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter item title', 'required': 'required'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Describe the item', 'rows': 3, 'required': 'required'}),
+            'category': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Category', 'required': 'required'}),
+            'region': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Region', 'required': 'required'}),
+            'district': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select District', 'required': 'required'}),
+            'ward': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Ward', 'required': 'required'}),
+            'place': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Place', 'required': 'required'}),
+            'image1': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image2': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image3': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        self.fields['region'].queryset = Region.objects.all()
+        self.fields['district'].queryset = District.objects.all()
+        self.fields['ward'].queryset = Ward.objects.all()
+        self.fields['place'].queryset = Place.objects.all()
 
-# LocationDependentForm for dynamically updating location fields
-class LocationDependentForm(forms.ModelForm):
-    def update_dependent_fields(self, data, instance):
-        # Districts
-        self.fields['district'].queryset = District.objects.none()
-        if 'region' in data:
+        # Dynamic filtering
+        if 'region' in self.data:
             try:
-                region_id = int(data.get('region'))
+                region_id = int(self.data.get('region'))
                 self.fields['district'].queryset = District.objects.filter(region_id=region_id).order_by('district_name')
             except (ValueError, TypeError):
                 pass
-        elif instance.pk and instance.region:
-            self.fields['district'].queryset = District.objects.filter(region=instance.region).order_by('district_name')
+        elif self.instance.pk and self.instance.region:
+            self.fields['district'].queryset = District.objects.filter(region=self.instance.region).order_by('district_name')
 
-        # Wards
-        self.fields['ward'].queryset = Ward.objects.none()
-        if 'district' in data:
+        if 'district' in self.data:
             try:
-                district_id = int(data.get('district'))
+                district_id = int(self.data.get('district'))
                 self.fields['ward'].queryset = Ward.objects.filter(district_id=district_id).order_by('ward_name')
             except (ValueError, TypeError):
                 pass
-        elif instance.pk and instance.district:
-            self.fields['ward'].queryset = Ward.objects.filter(district=instance.district).order_by('ward_name')
+        elif self.instance.pk and self.instance.district:
+            self.fields['ward'].queryset = Ward.objects.filter(district=self.instance.district).order_by('ward_name')
 
-        # Places
-        self.fields['place'].queryset = Place.objects.none()
-        if 'ward' in data:
+        if 'ward' in self.data:
             try:
-                ward_id = int(data.get('ward'))
+                ward_id = int(self.data.get('ward'))
                 self.fields['place'].queryset = Place.objects.filter(ward_id=ward_id).order_by('place_name')
             except (ValueError, TypeError):
                 pass
-        elif instance.pk and instance.ward:
-            self.fields['place'].queryset = Place.objects.filter(ward=instance.ward).order_by('place_name')
+        elif self.instance.pk and self.instance.ward:
+            self.fields['place'].queryset = Place.objects.filter(ward=self.instance.ward).order_by('place_name')
 
+        # Make location fields required
+        for field in ['region', 'district', 'ward', 'place']:
+            self.fields[field].required = True
+
+# ItemImagesForm for handling multiple item images
+class ItemImagesForm(forms.ModelForm):
+    class Meta:
+        model = ItemImage
+        fields = ['image']
+        widgets = {
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control', 'required': 'required'}),
+        }
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if not image:
+            raise forms.ValidationError("Image is required.")
+        return image
+
+ItemImageFormSet = modelformset_factory(
+    ItemImage,
+    form=ItemImagesForm,
+    extra=3,
+    max_num=3,
+    can_delete=True
+)
+
+class RequiredImageFormSet(BaseModelFormSet):
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+
+        has_image = False
+        for form in self.forms:
+            if form.cleaned_data and form.cleaned_data.get('image'):
+                has_image = True
+                break
+
+        if not has_image:
+            raise ValidationError("Please upload at least one image.")
 
 # MessageForm for sending messages
 class MessageForm(forms.ModelForm):

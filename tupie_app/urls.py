@@ -46,7 +46,7 @@ urlpatterns = [
     path("owner/<int:user_id>/", views.owner_profile, name="owner_profile"),
 
     # Item listing
-    path('list_item/', views.list_item, name='list_item'),
+    path('add_item/', views.add_item, name='add_item'),
     path('listed_items/', views.listed_items, name='listed_items'),
     path("item/<int:pk>/", views.item_detail, name="item_detail"),
     path("item/<int:pk>/request/", views.request_item, name="request_item"),

@@ -122,19 +122,31 @@ class Item(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
-    image = models.ImageField(upload_to='items/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     available = models.BooleanField(default=True)
-
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True)
     ward = models.ForeignKey(Ward, on_delete=models.SET_NULL, null=True, blank=True)
     place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True)
-
     street = models.CharField(max_length=255, blank=True, null=True)
 
+    image1 = models.ImageField(upload_to='items/', blank=True, null=True) 
+    image2 = models.ImageField(upload_to='items/', blank=True, null=True)
+    image3 = models.ImageField(upload_to='items/', blank=True, null=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def __str__(self):
-        return self.title
+        return f"{self.title} by {self.owner.username} ({self.category})"
+
+# Item Images
+class ItemImage(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='items/')
+
+    def __str__(self):
+        return f"Image for {self.item.title}"
     
 # Item request model
 class ItemRequest(models.Model):

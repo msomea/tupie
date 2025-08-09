@@ -6,12 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Tupie{% endblock %}</title>
-
+    <!-- Main and Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'tupie_app/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'tupie_app/css/style.css' %}">
+    <!-- Favicon-->
     <link rel="icon" href="{% static 'tupie_app/media/icons/favicon.ico' %}" type="image/x-icon">
-
-    {% block head_extra %}{% endblock %}
+    <!--jQuery and Bootstrap JS Bundle -->
     <script src="{% static 'tupie_app/js/jquery.min.js' %}" defer></script>
+    <script src="{% static 'tupie_app/js/bootstrap.bundle.min.js' %}"></script>
+    {% block head_extra %}{% endblock %}
+
 </head>
 <body>
     <div class="page-wrapper">

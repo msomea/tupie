@@ -4,6 +4,12 @@
 <h2>Resend Verification Email</h2>
 <section class="form-section">
 <form method="post" class="item-form">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="error-message">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    
     {% csrf_token %}
     <p>
         <label for="id_email">Email:</label>

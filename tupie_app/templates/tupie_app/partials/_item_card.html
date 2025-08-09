@@ -3,14 +3,27 @@
 <div class="item-card">
 
     <!--   Item Image -->
-    <div class="item-image">
-        {% if item.image %}
-            <img src="{{ item.image.url }}" alt="{{ item.title }}">
+    <div class="item-image {% if not item.images.all %}single-image{% endif %}">
+        {% if item.images.exists %}
+        <div id="itemCarousel{{ item.id }}" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for img in item.images.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ img.image.url }}" class="d-block w-100" alt="Item image">
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#itemCarousel{{ item.id }}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#itemCarousel{{ item.id }}" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+            </div>
         {% else %}
-            <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default">
+            <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default image" />
         {% endif %}
     </div>
-
     <!--   Title & Description -->
     <h3 style="text-transform: uppercase;">{{ item.title }}</h3>
     <p>{{ item.description|truncatewords:15 }}</p>
@@ -26,14 +39,14 @@
         {% include 'tupie_app/partials/_verification_badge.html' with user_profile=item.owner.userprofile %}
         
     </p>
+    <p>
     <!--   Availability status -->
         {% if item.available %}
             <span class="status available">  Available</span>
         {% else %}
             <span class="status unavailable">❌ Taken</span>
         {% endif %}
-        
-
+    </p>    
 
     <!--   Improved Location Display -->
     {% if item.street or item.place or item.ward or item.district or item.region %}
@@ -66,3 +79,32 @@
 
     <a href="{% url 'tupie_app:item_detail' item.pk %}" class="cta-btn">View Details</a>
 </div>
+<style>
+.carousel-inner img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.carousel-control-prev,
+.carousel-control-next {
+    width: 30px;
+    height: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 30px;
+    height: 30px;
+    background-size: 30px 30px;
+}
+</style>

@@ -23,7 +23,7 @@
           {% for req in my_requests %}
           <tr>
             <td>
-              <a href="{% url 'tupie_app:item_detail' req.item.id %}">
+              <a href="{% url 'tupie_app:item_detail' req.item.id %}" class="inline-link">
                 {{ req.item.title }}
               </a>
             </td>
@@ -40,7 +40,7 @@
             <td>{{ req.created_at|date:"M d, Y H:i" }}</td>
             <td>
               {% if req.status == "pending" %}
-                <a href="{% url 'tupie_app:update_request_status' req.id 'accept' %}" class="btn-accept"> Accept</a>
+                <a href="{% url 'tupie_app:update_request_status' req.id 'accept' %}" class="btn-accept">✔️ Accept</a>
                 <a href="{% url 'tupie_app:update_request_status' req.id 'decline' %}" class="btn-decline">❌ Decline</a>
               {% else %}
                 <span style="color: #777;">No actions</span>

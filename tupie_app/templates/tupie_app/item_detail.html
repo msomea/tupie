@@ -4,6 +4,7 @@
 {% block title %}{{ item.title }} - Details{% endblock %}
 
 {% block content %}
+
 <section class="form-section">
     {% if messages %}
   <div class="messages">
@@ -14,11 +15,25 @@
 {% endif %}
 
     <h1 style="text-transform: uppercase;">{{ item.title }}</h1>
-    <div class="item-image">
-        {% if item.image %}
-            <img src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width:400px;border-radius:8px;">
+    <div class="item-image {% if not item.images.all %}single-image{% endif %}">
+        {% if item.images.exists %}
+        <div id="itemCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for img in item.images.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ img.image.url }}" class="d-block w-100" alt="Item image">
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#itemCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#itemCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+            </div>
         {% else %}
-            <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default" style="max-width:200px;">
+            <img src="{% static 'tupie_app/media/images/tupie_logo_icon.png' %}" alt="Default image" />
         {% endif %}
     </div>
 
@@ -52,8 +67,6 @@
         {% if item.region %}{{ item.region.region_name }}{% endif %}
     </p>
 
-
-
     <div style="margin-top:20px;">
         {% if user.is_authenticated %}
             {% if not item.available %}
@@ -71,4 +84,37 @@
         <a href="{% url 'tupie_app:listed_items' %}"><button class="cta-btn">View More Items</button></a>
     </div>
 </section>
+<style>
+.carousel-inner img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    object-fit: contain
+}
+.carousel-control-prev,
+.carousel-control-next {
+    width: 40px;
+    height: 30px;
+    top: 50%;
+    background-color: #4A704A;
+    border-radius: 8px;
+    transform: translateY(-50%);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 30px;
+    height: 30px;
+    background-size: 30px 30px;
+}
+</style>
+
 {% endblock %}
