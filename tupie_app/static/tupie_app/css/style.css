@@ -12,6 +12,11 @@ html, body {
 h2, h3 {
   color: #4A704A;
 }
+hr {
+  background-color: #4A704A;
+  height: 4px;
+  border: none;
+}
 :target::before {
     content: "";
     display: block;
