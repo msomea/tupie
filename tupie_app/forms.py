@@ -33,12 +33,12 @@ class UserProfileUpdateForm(forms.ModelForm):
             'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your full name as it appears on ID'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your phone number'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'}),
-            'photo': forms.ClearableFileInput(attrs={'class': 'form-control', 'placeholder': 'Select Image'}),
+            'photo': forms.FileInput(attrs={'class': 'form-control', 'placeholder': 'Select Image'}),
             'region': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Region' }),
             'district': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select District'}),
             'ward': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Ward'}),
             'place': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Select Place'}),
-            'id_document': forms.ClearableFileInput(attrs={'class': 'form-control', 'placeholder': 'Select your ID'}),
+            'id_document': forms.FileInput(attrs={'class': 'form-control', 'placeholder': 'Select your ID'}),
         }
     
     def clean_email(self):

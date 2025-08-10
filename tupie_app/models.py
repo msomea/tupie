@@ -92,10 +92,7 @@ class UserProfile(models.Model):
     place = models.ForeignKey('Place', on_delete=models.SET_NULL, blank=True, null=True)
     
     id_document = models.ImageField(upload_to='verification_ids/', blank=True, null=True)
-    verification_status = models.CharField(
-        max_length=20,
-        choices=VERIFICATION_CHOICES,
-        default='unverified'
+    verification_status = models.CharField(max_length=20, choices=VERIFICATION_CHOICES, default='unverified'
     )
 
     def __str__(self):

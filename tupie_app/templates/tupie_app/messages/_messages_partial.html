@@ -1,15 +1,50 @@
-{% for msg in conversation.messages.all %}
-  <div class="{% if msg.sender == request.user %}text-right{% else %}text-left{% endif %}">
-    <p class="inline-block bg-white p-2 rounded shadow-sm mb-1">
-      <strong>{{ msg.sender.username }}:</strong> {{ msg.content }} 
-      {% if msg.sender == request.user %}
-        <small class="text-xs text-gray-500">
-          {% if msg.is_read %}✔✔ Read{% else %}✔ Sent{% endif %}
-        </small>
+{% load static %}
+
+{% for msg in conversation.messages.all reversed %}
+  {% if msg.sender == request.user %}
+    <!-- Sender -->
+    <div class="d-flex justify-content-end mb-2 message-item" data-id="{{ msg.id }}">
+      <div class="me-2 text-end" style="max-width: 70%;">
+        <div class="p-2 px-3 bg-primary text-white rounded-pill shadow-sm">
+          {{ msg.content }}
+          <div class="small mt-1 text-white-50">
+            {{ msg.timestamp|date:"M d, Y H:i" }}
+            {% if msg.is_read %}
+              <span class="ms-1">✔✔ Read</span>
+            {% else %}
+              <span class="ms-1">✔ Sent</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% if request.user.userprofile.photo %}
+        <img src="{{ request.user.userprofile.photo.url }}" alt="Profile photo"
+             class="rounded-circle" width="40" height="40" alt="Me">
+      {% else %}
+        <img src="{% static 'tupie_app/media/images/avatar.png' %}" alt="Default Avatar"
+             class="rounded-circle" width="40" height="40" alt="Me">
       {% endif %}
-    </p>
-    <small class="text-xs text-gray-500">{{ msg.timestamp|date:"M d, Y H:i" }}</small>
-  </div>
+    </div>
+  {% else %}
+    <!-- Receiver -->
+    <div class="d-flex justify-content-start mb-2 message-item" data-id="{{ msg.id }}">
+      {% if other_user.userprofile.photo %}
+        <img src="{{ other_user.userprofile.photo.url }}" alt="Profile photo"
+             class="rounded-circle me-2" width="40" height="40" alt="{{ other_user.username }}">
+      {% else %}
+        <img src="{% static 'tupie_app/media/images/avatar.png' %}" alt="Default Avatar"
+             class="rounded-circle me-2" width="40" height="40" alt="{{ other_user.username }}">
+      {% endif %}
+      <div class="text-start" style="max-width: 70%;">
+        <div class="p-2 px-3 bg-white text-dark rounded-pill shadow-sm">
+          {{ msg.content }}
+          <div class="small mt-1 text-muted">
+            {{ msg.timestamp|date:"M d, Y H:i" }}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
 {% empty %}
-  <p>No messages yet. Start the conversation!</p>
+  <p class="text-center text-muted">No messages yet. Start the conversation!</p>
 {% endfor %}

@@ -667,22 +667,6 @@ hr {
     margin: 0 auto;
   }
 }
-/* Badge styles */
-.badge {
-  font-size: 0.8em;
-  margin-left: 3px;
-  vertical-align: super; /*   moves it slightly up */
-  font-weight: bold;
-}
-
-.blue-check {
-  color: #1E90FF; /* DodgerBlue */
-}
-
-.gold-check {
-  color: #FFD700; /* Gold */
-}
-
 
 /* Footer */
 footer {
